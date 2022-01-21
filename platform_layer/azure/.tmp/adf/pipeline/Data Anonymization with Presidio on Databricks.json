@@ -1,0 +1,47 @@
+{
+	"name": "Data Anonymization with Presidio on Databricks",
+	"properties": {
+		"description": "Anonymize PII data from CSV dataset with Presidio on Azure Databricks.",
+		"activities": [
+			{
+				"name": "AnonymizeSource",
+				"description": "Anonymize dataset with Presidio",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/agandini@microsoft.com/Anonymization/batch_processing_adls_from_ADF",
+					"baseParameters": {
+						"storage_input_path": {
+							"value": "/mnt/saleslt-mount/Customer/*",
+							"type": "Expression"
+						},
+						"storage_output_folder": "/mnt/anonymized-mount/CustomerAnonymizedCsv",
+						"file_format": {
+							"value": "csv",
+							"type": "Expression"
+						},
+						"anonymized_column": "valueaaa"
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Ls_AzureDatabricks_01",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "Anonymization"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-12-13T12:46:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

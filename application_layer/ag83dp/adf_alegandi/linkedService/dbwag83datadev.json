@@ -1,0 +1,14 @@
+{
+	"name": "dbwag83datadev",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-8559776404895366.6.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/rg-ag83data-dev-001/providers/Microsoft.Databricks/workspaces/dbw-ag83data-dev",
+			"existingClusterId": "1210-231828-c18nmv64"
+		}
+	}
+}

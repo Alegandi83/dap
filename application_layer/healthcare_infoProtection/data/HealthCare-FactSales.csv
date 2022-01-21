@@ -1,0 +1,202 @@
+CareManager;PayerName;CampaignName;Region;State;City;Revenue;RevenueTarget
+CareManagerMiami;Aetna;Care Like Family;South East;Florida;Miami;$5,333.00;$7,346.00
+CareManagerMiami;Anthem;Care Like Family;South East;Florida;Miami;$5,333.00;$7,346.00
+CareManagerMiami;Blue Cross Blue Shield;Care Like Family;South East;Florida;Miami;$5,333.00;$7,346.00
+CareManagerMiami;UnitedHealthcare;Care Like Family;South East;Florida;Miami;$5,333.00;$7,346.00
+CareManagerMiami;Blue Cross Blue Shield;For Your Life;South East;Florida;Miami;$10,246.00;$18,683.00
+CareManagerMiami;Medicare;For Your Life;South East;Florida;Miami;$10,246.00;$18,683.00
+CareManagerMiami;NO_INSURANCE;For Your Life;South East;Florida;Miami;$10,246.00;$18,683.00
+CareManagerMiami;Blue Cross Blue Shield;For Your Life;South East;Florida;Miami;$12,488.00;$18,299.00
+CareManagerMiami;Cigna Health;For Your Life;South East;Florida;Miami;$12,488.00;$18,299.00
+CareManagerMiami;Dual Eligible;For Your Life;South East;Florida;Miami;$12,488.00;$18,299.00
+CareManagerMiami;Humana;For Your Life;South East;Florida;Miami;$12,488.00;$18,299.00
+CareManagerMiami;Cigna Health;For Your Life;South East;Florida;Miami;$13,873.00;$10,617.00
+CareManagerMiami;Humana;For Your Life;South East;Florida;Miami;$13,873.00;$10,617.00
+CareManagerMiami;Medicare;For Your Life;South East;Florida;Miami;$13,873.00;$10,617.00
+CareManagerMiami;UnitedHealthcare;For Your Life;South East;Florida;Miami;$13,873.00;$10,617.00
+CareManagerMiami;Aetna;For Your Life;South East;Florida;Miami;$17,488.00;$9,941.00
+CareManagerMiami;Anthem;For Your Life;South East;Florida;Miami;$17,488.00;$9,941.00
+CareManagerMiami;Dual Eligible;For Your Life;South East;Florida;Miami;$17,488.00;$9,941.00
+CareManagerMiami;Medicare;For Your Life;South East;Florida;Miami;$17,488.00;$9,941.00
+CareManagerMiami;Cigna Health;For Your Life;South East;Florida;Miami;$6,883.00;$10,341.00
+CareManagerMiami;Humana;For Your Life;South East;Florida;Miami;$6,883.00;$10,341.00
+CareManagerMiami;Medicaid;For Your Life;South East;Florida;Miami;$6,883.00;$10,341.00
+CareManagerMiami;NO_INSURANCE;For Your Life;South East;Florida;Miami;$6,883.00;$10,341.00
+CareManagerMiami;Cigna Health;For Your Life;South East;Florida;Miami;$7,607.00;$15,850.00
+CareManagerMiami;Dual Eligible;For Your Life;South East;Florida;Miami;$7,607.00;$15,850.00
+CareManagerMiami;Humana;For Your Life;South East;Florida;Miami;$7,607.00;$15,850.00
+CareManagerMiami;Medicaid;For Your Life;South East;Florida;Miami;$7,607.00;$15,850.00
+CareManagerMiami;Aetna;For Your Life;South East;Florida;Miami;$9,112.00;$11,930.00
+CareManagerMiami;Cigna Health;For Your Life;South East;Florida;Miami;$9,112.00;$11,930.00
+CareManagerMiami;Humana;For Your Life;South East;Florida;Miami;$9,112.00;$11,930.00
+CareManagerMiami;Medicare;For Your Life;South East;Florida;Miami;$9,112.00;$11,930.00
+CareManagerMiami;Aetna;Hit the track;South East;Florida;Miami;$16,611.00;$7,917.00
+CareManagerMiami;Blue Cross Blue Shield;Hit the track;South East;Florida;Miami;$16,611.00;$7,917.00
+CareManagerMiami;Medicaid;Hit the track;South East;Florida;Miami;$16,611.00;$7,917.00
+CareManagerMiami;NO_INSURANCE;Hit the track;South East;Florida;Miami;$16,611.00;$7,917.00
+CareManagerMiami;Cigna Health;Hit the track;South East;Florida;Miami;$5,117.00;$8,713.00
+CareManagerMiami;Humana;Hit the track;South East;Florida;Miami;$5,117.00;$8,713.00
+CareManagerMiami;Medicaid;Hit the track;South East;Florida;Miami;$5,117.00;$8,713.00
+CareManagerMiami;NO_INSURANCE;Hit the track;South East;Florida;Miami;$5,117.00;$8,713.00
+CareManagerMiami;Aetna;Hope;South East;Florida;Miami;$12,711.00;$8,946.00
+CareManagerMiami;Dual Eligible;Hope;South East;Florida;Miami;$12,711.00;$8,946.00
+CareManagerMiami;NO_INSURANCE;Hope;South East;Florida;Miami;$12,711.00;$8,946.00
+CareManagerMiami;UnitedHealthcare;Hope;South East;Florida;Miami;$12,711.00;$8,946.00
+CareManagerMiami;Anthem;Hope;South East;Florida;Miami;$12,929.00;$9,077.00
+CareManagerMiami;Blue Cross Blue Shield;Hope;South East;Florida;Miami;$12,929.00;$9,077.00
+CareManagerMiami;Dual Eligible;Hope;South East;Florida;Miami;$12,929.00;$9,077.00
+CareManagerMiami;Medicare;Hope;South East;Florida;Miami;$12,929.00;$9,077.00
+CareManagerMiami;Anthem;Hope;South East;Florida;Miami;$14,865.00;$15,960.00
+CareManagerMiami;Cigna Health;Hope;South East;Florida;Miami;$14,865.00;$15,960.00
+CareManagerMiami;Medicare;Hope;South East;Florida;Miami;$14,865.00;$15,960.00
+CareManagerMiami;NO_INSURANCE;Hope;South East;Florida;Miami;$14,865.00;$15,960.00
+CareManagerMiami;Anthem;Hope;South East;Florida;Miami;$16,386.00;$9,989.00
+CareManagerMiami;Cigna Health;Hope;South East;Florida;Miami;$16,386.00;$9,989.00
+CareManagerMiami;Humana;Hope;South East;Florida;Miami;$16,386.00;$9,989.00
+CareManagerMiami;NO_INSURANCE;Hope;South East;Florida;Miami;$16,386.00;$9,989.00
+CareManagerMiami;Cigna Health;Hope;South East;Florida;Miami;$16,810.00;$10,178.00
+CareManagerMiami;Humana;Hope;South East;Florida;Miami;$16,810.00;$10,178.00
+CareManagerMiami;Medicaid;Hope;South East;Florida;Miami;$16,810.00;$10,178.00
+CareManagerMiami;NO_INSURANCE;Hope;South East;Florida;Miami;$16,810.00;$10,178.00
+CareManagerMiami;Blue Cross Blue Shield;Patient Stories;South East;Florida;Miami;$10,269.00;$11,191.00
+CareManagerMiami;Dual Eligible;Patient Stories;South East;Florida;Miami;$10,269.00;$11,191.00
+CareManagerMiami;Medicaid;Patient Stories;South East;Florida;Miami;$10,269.00;$11,191.00
+CareManagerMiami;UnitedHealthcare;Patient Stories;South East;Florida;Miami;$10,269.00;$11,191.00
+CareManagerMiami;Anthem;Patient Stories;South East;Florida;Miami;$11,059.00;$19,059.00
+CareManagerMiami;Cigna Health;Patient Stories;South East;Florida;Miami;$11,059.00;$19,059.00
+CareManagerMiami;Dual Eligible;Patient Stories;South East;Florida;Miami;$11,059.00;$19,059.00
+CareManagerMiami;NO_INSURANCE;Patient Stories;South East;Florida;Miami;$11,059.00;$19,059.00
+CareManagerMiami;Anthem;Patient Stories;South East;Florida;Miami;$12,174.00;$6,996.00
+CareManagerMiami;Blue Cross Blue Shield;Patient Stories;South East;Florida;Miami;$12,174.00;$6,996.00
+CareManagerMiami;Cigna Health;Patient Stories;South East;Florida;Miami;$12,174.00;$6,996.00
+CareManagerMiami;UnitedHealthcare;Patient Stories;South East;Florida;Miami;$12,174.00;$6,996.00
+CareManagerMiami;Aetna;Patient Stories;South East;Florida;Miami;$12,974.00;$19,462.00
+CareManagerMiami;Dual Eligible;Patient Stories;South East;Florida;Miami;$12,974.00;$19,462.00
+CareManagerMiami;Humana;Patient Stories;South East;Florida;Miami;$12,974.00;$19,462.00
+CareManagerMiami;NO_INSURANCE;Patient Stories;South East;Florida;Miami;$12,974.00;$19,462.00
+CareManagerMiami;Aetna;Patient Stories;South East;Florida;Miami;$13,349.00;$16,936.00
+CareManagerMiami;Anthem;Patient Stories;South East;Florida;Miami;$13,349.00;$16,936.00
+CareManagerMiami;Blue Cross Blue Shield;Patient Stories;South East;Florida;Miami;$13,349.00;$16,936.00
+CareManagerMiami;Medicare;Patient Stories;South East;Florida;Miami;$13,349.00;$16,936.00
+CareManagerMiami;Aetna;Patient Stories;South East;Florida;Miami;$15,142.00;$7,147.00
+CareManagerMiami;Medicaid;Patient Stories;South East;Florida;Miami;$15,142.00;$7,147.00
+CareManagerMiami;Medicare;Patient Stories;South East;Florida;Miami;$15,142.00;$7,147.00
+CareManagerMiami;UnitedHealthcare;Patient Stories;South East;Florida;Miami;$15,142.00;$7,147.00
+CareManagerMiami;Anthem;Patient Stories;South East;Florida;Miami;$5,972.00;$10,692.00
+CareManagerMiami;Cigna Health;Patient Stories;South East;Florida;Miami;$5,972.00;$10,692.00
+CareManagerMiami;Medicaid;Patient Stories;South East;Florida;Miami;$5,972.00;$10,692.00
+CareManagerMiami;Medicare;Patient Stories;South East;Florida;Miami;$5,972.00;$10,692.00
+CareManagerMiami;Aetna;Thanks Giving;South East;Florida;Miami;$11,400.00;$15,117.00
+CareManagerMiami;Blue Cross Blue Shield;Thanks Giving;South East;Florida;Miami;$11,400.00;$15,117.00
+CareManagerMiami;NO_INSURANCE;Thanks Giving;South East;Florida;Miami;$11,400.00;$15,117.00
+CareManagerMiami;UnitedHealthcare;Thanks Giving;South East;Florida;Miami;$11,400.00;$15,117.00
+CareManagerMiami;Anthem;Thanks Giving;South East;Florida;Miami;$17,637.00;$6,876.00
+CareManagerMiami;Blue Cross Blue Shield;Thanks Giving;South East;Florida;Miami;$17,637.00;$6,876.00
+CareManagerMiami;Humana;Thanks Giving;South East;Florida;Miami;$17,637.00;$6,876.00
+CareManagerMiami;Medicaid;Thanks Giving;South East;Florida;Miami;$17,637.00;$6,876.00
+CareManagerMiami;Aetna;Thanks Giving;South East;Florida;Miami;$5,766.00;$17,620.00
+CareManagerMiami;Humana;Thanks Giving;South East;Florida;Miami;$5,766.00;$17,620.00
+CareManagerMiami;Medicare;Thanks Giving;South East;Florida;Miami;$5,766.00;$17,620.00
+CareManagerMiami;UnitedHealthcare;Thanks Giving;South East;Florida;Miami;$5,766.00;$17,620.00
+CareManagerMiami;Cigna Health;Thanks Giving;South East;Florida;Miami;$5,867.00;$19,049.00
+CareManagerMiami;Humana;Thanks Giving;South East;Florida;Miami;$5,867.00;$19,049.00
+CareManagerMiami;NO_INSURANCE;Thanks Giving;South East;Florida;Miami;$5,867.00;$19,049.00
+CareManagerMiami;Humana;Thanks Giving;South East;Florida;Miami;$9,486.00;$8,891.00
+CareManagerMiami;Medicaid;Thanks Giving;South East;Florida;Miami;$9,486.00;$8,891.00
+CareManagerMiami;Medicare;Thanks Giving;South East;Florida;Miami;$9,486.00;$8,891.00
+CareManagerMiami;NO_INSURANCE;Thanks Giving;South East;Florida;Miami;$9,486.00;$8,891.00
+CareManagerMiami;Anthem;You Have Us;South East;Florida;Miami;$12,882.00;$19,806.00
+CareManagerMiami;Dual Eligible;You Have Us;South East;Florida;Miami;$12,882.00;$19,806.00
+CareManagerMiami;Medicare;You Have Us;South East;Florida;Miami;$12,882.00;$19,806.00
+CareManagerMiami;Anthem;You Have Us;South East;Florida;Miami;$14,691.00;$14,601.00
+CareManagerMiami;Blue Cross Blue Shield;You Have Us;South East;Florida;Miami;$14,691.00;$14,601.00
+CareManagerMiami;Dual Eligible;You Have Us;South East;Florida;Miami;$14,691.00;$14,601.00
+CareManagerMiami;Medicaid;You Have Us;South East;Florida;Miami;$14,691.00;$14,601.00
+CareManagerMiami;Cigna Health;You Have Us;South East;Florida;Miami;$8,284.00;$9,840.00
+CareManagerMiami;Dual Eligible;You Have Us;South East;Florida;Miami;$8,284.00;$9,840.00
+CareManagerMiami;NO_INSURANCE;You Have Us;South East;Florida;Miami;$8,284.00;$9,840.00
+CareManagerMiami;UnitedHealthcare;You Have Us;South East;Florida;Miami;$8,284.00;$9,840.00
+CareManagerLosAngeles;Aetna;Care Like Family;Southern California;California;Los Angeles;$13,221.00;$8,584.00
+CareManagerLosAngeles;Dual Eligible;Care Like Family;Southern California;California;Los Angeles;$13,221.00;$8,584.00
+CareManagerLosAngeles;Humana;Care Like Family;Southern California;California;Los Angeles;$13,221.00;$8,584.00
+CareManagerLosAngeles;UnitedHealthcare;Care Like Family;Southern California;California;Los Angeles;$13,221.00;$8,584.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Care Like Family;Southern California;California;Los Angeles;$5,434.00;$10,709.00
+CareManagerLosAngeles;Humana;Care Like Family;Southern California;California;Los Angeles;$5,434.00;$10,709.00
+CareManagerLosAngeles;Medicare;Care Like Family;Southern California;California;Los Angeles;$5,434.00;$10,709.00
+CareManagerLosAngeles;UnitedHealthcare;Care Like Family;Southern California;California;Los Angeles;$5,434.00;$10,709.00
+CareManagerLosAngeles;Anthem;Care Like Family;Southern California;California;Los Angeles;$6,497.00;$6,147.00
+CareManagerLosAngeles;Medicare;Care Like Family;Southern California;California;Los Angeles;$6,497.00;$6,147.00
+CareManagerLosAngeles;UnitedHealthcare;Care Like Family;Southern California;California;Los Angeles;$6,497.00;$6,147.00
+CareManagerLosAngeles;Aetna;For Your Life;Southern California;California;Los Angeles;$11,245.00;$18,041.00
+CareManagerLosAngeles;Humana;For Your Life;Southern California;California;Los Angeles;$11,245.00;$18,041.00
+CareManagerLosAngeles;Medicaid;For Your Life;Southern California;California;Los Angeles;$11,245.00;$18,041.00
+CareManagerLosAngeles;NO_INSURANCE;For Your Life;Southern California;California;Los Angeles;$11,245.00;$18,041.00
+CareManagerLosAngeles;Anthem;For Your Life;Southern California;California;Los Angeles;$13,802.00;$5,380.00
+CareManagerLosAngeles;Blue Cross Blue Shield;For Your Life;Southern California;California;Los Angeles;$13,802.00;$5,380.00
+CareManagerLosAngeles;Dual Eligible;For Your Life;Southern California;California;Los Angeles;$13,802.00;$5,380.00
+CareManagerLosAngeles;UnitedHealthcare;For Your Life;Southern California;California;Los Angeles;$13,802.00;$5,380.00
+CareManagerLosAngeles;Anthem;For Your Life;Southern California;California;Los Angeles;$15,521.00;$13,935.00
+CareManagerLosAngeles;Medicaid;For Your Life;Southern California;California;Los Angeles;$15,521.00;$13,935.00
+CareManagerLosAngeles;Medicare;For Your Life;Southern California;California;Los Angeles;$15,521.00;$13,935.00
+CareManagerLosAngeles;NO_INSURANCE;For Your Life;Southern California;California;Los Angeles;$15,521.00;$13,935.00
+CareManagerLosAngeles;Aetna;For Your Life;Southern California;California;Los Angeles;$16,207.00;$14,061.00
+CareManagerLosAngeles;Anthem;For Your Life;Southern California;California;Los Angeles;$16,207.00;$14,061.00
+CareManagerLosAngeles;Cigna Health;For Your Life;Southern California;California;Los Angeles;$16,207.00;$14,061.00
+CareManagerLosAngeles;NO_INSURANCE;For Your Life;Southern California;California;Los Angeles;$16,207.00;$14,061.00
+CareManagerLosAngeles;Aetna;For Your Life;Southern California;California;Los Angeles;$6,278.00;$11,478.00
+CareManagerLosAngeles;Anthem;For Your Life;Southern California;California;Los Angeles;$6,278.00;$11,478.00
+CareManagerLosAngeles;Dual Eligible;For Your Life;Southern California;California;Los Angeles;$6,278.00;$11,478.00
+CareManagerLosAngeles;Medicare;For Your Life;Southern California;California;Los Angeles;$6,278.00;$11,478.00
+CareManagerLosAngeles;Cigna Health;For Your Life;Southern California;California;Los Angeles;$6,580.00;$5,490.00
+CareManagerLosAngeles;Dual Eligible;For Your Life;Southern California;California;Los Angeles;$6,580.00;$5,490.00
+CareManagerLosAngeles;Humana;For Your Life;Southern California;California;Los Angeles;$6,580.00;$5,490.00
+CareManagerLosAngeles;Medicaid;For Your Life;Southern California;California;Los Angeles;$6,580.00;$5,490.00
+CareManagerLosAngeles;Aetna;Hit the track;Southern California;California;Los Angeles;$5,712.00;$6,947.00
+CareManagerLosAngeles;Anthem;Hit the track;Southern California;California;Los Angeles;$5,712.00;$6,947.00
+CareManagerLosAngeles;Cigna Health;Hit the track;Southern California;California;Los Angeles;$5,712.00;$6,947.00
+CareManagerLosAngeles;Dual Eligible;Hit the track;Southern California;California;Los Angeles;$5,712.00;$6,947.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Hope;Southern California;California;Los Angeles;$5,117.00;$9,305.00
+CareManagerLosAngeles;Cigna Health;Hope;Southern California;California;Los Angeles;$5,117.00;$9,305.00
+CareManagerLosAngeles;Medicaid;Hope;Southern California;California;Los Angeles;$5,117.00;$9,305.00
+CareManagerLosAngeles;UnitedHealthcare;Hope;Southern California;California;Los Angeles;$5,117.00;$9,305.00
+CareManagerLosAngeles;Cigna Health;Hope;Southern California;California;Los Angeles;$6,689.00;$13,088.00
+CareManagerLosAngeles;Dual Eligible;Hope;Southern California;California;Los Angeles;$6,689.00;$13,088.00
+CareManagerLosAngeles;Medicaid;Hope;Southern California;California;Los Angeles;$6,689.00;$13,088.00
+CareManagerLosAngeles;NO_INSURANCE;Hope;Southern California;California;Los Angeles;$6,689.00;$13,088.00
+CareManagerLosAngeles;Dual Eligible;Patient Stories;Southern California;California;Los Angeles;$10,027.00;$10,643.00
+CareManagerLosAngeles;Medicaid;Patient Stories;Southern California;California;Los Angeles;$10,027.00;$10,643.00
+CareManagerLosAngeles;NO_INSURANCE;Patient Stories;Southern California;California;Los Angeles;$10,027.00;$10,643.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Patient Stories;Southern California;California;Los Angeles;$16,593.00;$10,533.00
+CareManagerLosAngeles;Humana;Patient Stories;Southern California;California;Los Angeles;$16,593.00;$10,533.00
+CareManagerLosAngeles;Medicaid;Patient Stories;Southern California;California;Los Angeles;$16,593.00;$10,533.00
+CareManagerLosAngeles;UnitedHealthcare;Patient Stories;Southern California;California;Los Angeles;$16,593.00;$10,533.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Patient Stories;Southern California;California;Los Angeles;$5,889.00;$9,819.00
+CareManagerLosAngeles;Dual Eligible;Patient Stories;Southern California;California;Los Angeles;$5,889.00;$9,819.00
+CareManagerLosAngeles;Medicaid;Patient Stories;Southern California;California;Los Angeles;$5,889.00;$9,819.00
+CareManagerLosAngeles;Medicare;Patient Stories;Southern California;California;Los Angeles;$5,889.00;$9,819.00
+CareManagerLosAngeles;Aetna;Thanks Giving;Southern California;California;Los Angeles;$10,225.00;$12,472.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Thanks Giving;Southern California;California;Los Angeles;$10,225.00;$12,472.00
+CareManagerLosAngeles;UnitedHealthcare;Thanks Giving;Southern California;California;Los Angeles;$10,225.00;$12,472.00
+CareManagerLosAngeles;Aetna;Thanks Giving;Southern California;California;Los Angeles;$11,231.00;$18,669.00
+CareManagerLosAngeles;Cigna Health;Thanks Giving;Southern California;California;Los Angeles;$11,231.00;$18,669.00
+CareManagerLosAngeles;Dual Eligible;Thanks Giving;Southern California;California;Los Angeles;$11,231.00;$18,669.00
+CareManagerLosAngeles;UnitedHealthcare;Thanks Giving;Southern California;California;Los Angeles;$11,231.00;$18,669.00
+CareManagerLosAngeles;Aetna;Thanks Giving;Southern California;California;Los Angeles;$11,703.00;$9,822.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Thanks Giving;Southern California;California;Los Angeles;$11,703.00;$9,822.00
+CareManagerLosAngeles;UnitedHealthcare;Thanks Giving;Southern California;California;Los Angeles;$11,703.00;$9,822.00
+CareManagerLosAngeles;Aetna;Thanks Giving;Southern California;California;Los Angeles;$13,098.00;$5,663.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Thanks Giving;Southern California;California;Los Angeles;$13,098.00;$5,663.00
+CareManagerLosAngeles;Humana;Thanks Giving;Southern California;California;Los Angeles;$13,098.00;$5,663.00
+CareManagerLosAngeles;UnitedHealthcare;Thanks Giving;Southern California;California;Los Angeles;$13,098.00;$5,663.00
+CareManagerLosAngeles;Aetna;Thanks Giving;Southern California;California;Los Angeles;$13,681.00;$13,003.00
+CareManagerLosAngeles;Anthem;Thanks Giving;Southern California;California;Los Angeles;$13,681.00;$13,003.00
+CareManagerLosAngeles;Cigna Health;Thanks Giving;Southern California;California;Los Angeles;$13,681.00;$13,003.00
+CareManagerLosAngeles;UnitedHealthcare;Thanks Giving;Southern California;California;Los Angeles;$13,681.00;$13,003.00
+CareManagerLosAngeles;Blue Cross Blue Shield;Thanks Giving;Southern California;California;Los Angeles;$16,850.00;$15,753.00
+CareManagerLosAngeles;Medicaid;Thanks Giving;Southern California;California;Los Angeles;$16,850.00;$15,753.00
+CareManagerLosAngeles;Medicare;Thanks Giving;Southern California;California;Los Angeles;$16,850.00;$15,753.00
+CareManagerLosAngeles;NO_INSURANCE;Thanks Giving;Southern California;California;Los Angeles;$16,850.00;$15,753.00
+CareManagerLosAngeles;Anthem;You Have Us;Southern California;California;Los Angeles;$16,240.00;$16,038.00
+CareManagerLosAngeles;Dual Eligible;You Have Us;Southern California;California;Los Angeles;$16,240.00;$16,038.00
+CareManagerLosAngeles;Humana;You Have Us;Southern California;California;Los Angeles;$16,240.00;$16,038.00
+CareManagerLosAngeles;Medicare;You Have Us;Southern California;California;Los Angeles;$16,240.00;$16,038.00

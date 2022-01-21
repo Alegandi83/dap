@@ -1,0 +1,8 @@
+USE hpi;
+GO
+
+DROP SCHEMA IF EXISTS hpi;
+GO
+
+CREATE SCHEMA hpi;
+GO

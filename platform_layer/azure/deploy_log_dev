@@ -1,0 +1,17 @@
+Deploying to Subscription: 272f5f06-6693-48ae-975b-b5c7553539c2
+Creating resource group: ag83-00004-dev-rg
+{
+  "id": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/ag83-00004-dev-rg",
+  "location": "westeurope",
+  "managedBy": null,
+  "name": "ag83-00004-dev-rg",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": {
+    "Environment": "dev"
+  },
+  "type": "Microsoft.Resources/resourceGroups"
+}
+Validating deployment
+Deploying resources into ag83-00004-dev-rg
