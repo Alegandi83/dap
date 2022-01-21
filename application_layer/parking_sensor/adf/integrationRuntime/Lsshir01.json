@@ -1,0 +1,12 @@
+{
+	"name": "Lsshir01",
+	"properties": {
+		"type": "SelfHosted",
+		"typeProperties": {
+			"linkedInfo": {
+				"resourceId": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourcegroups/rg-ag83data-dev-001/providers/Microsoft.DataFactory/factories/adf-ag83data-dev/integrationruntimes/ag83-integrationRuntime1",
+				"authorizationType": "Rbac"
+			}
+		}
+	}
+}
