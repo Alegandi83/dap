@@ -23,6 +23,29 @@
 						"Control_Table_Schema_SourceTableSchema": "SourceTableSchema"
 					}
 				}
+			},
+			{
+				"name": "Process_ADLS_to_Syn",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Ingest_SQLS_to_ADLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"SourceContainer": "hpi"
+					}
+				}
 			}
 		],
 		"folder": {
