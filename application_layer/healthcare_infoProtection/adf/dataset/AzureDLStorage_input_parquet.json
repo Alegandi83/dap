@@ -1,0 +1,31 @@
+{
+	"name": "AzureDLStorage_input_parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ls_AdlsGen2_01",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SourceContainer": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "BulkCopies"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": {
+					"value": "@dataset().SourceContainer",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

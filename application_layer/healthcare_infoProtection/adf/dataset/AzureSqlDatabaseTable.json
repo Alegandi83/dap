@@ -1,0 +1,35 @@
+{
+	"name": "AzureSqlDatabaseTable",
+	"properties": {
+		"description": "Connection to your data source store.",
+		"linkedServiceName": {
+			"referenceName": "Ls_SqlDb_01",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sourceTableName": {
+				"type": "string"
+			},
+			"sourceTableSchema": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "BulkCopies"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().sourceTableSchema",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().sourceTableName",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
