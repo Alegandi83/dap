@@ -516,8 +516,8 @@
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
