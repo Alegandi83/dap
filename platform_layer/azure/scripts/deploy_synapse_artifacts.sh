@@ -143,6 +143,16 @@ uploadSynapseArtifactsToSparkPool(){
     az rest --method put --headers "Content-Type=application/json" --url "${managementApiUri}" --body "$json_body"
 }
 
+createIntegrationRuntime () {
+    declare name=$1
+    echo "Creating Synapse IntegrationRuntime: $name"
+    az synapse integration-runtime create --file @./.tmp/synapse/workspace/integrationRuntime/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+}
+getIntegrationRuntimeConnectionInfo () {
+    declare name=$1
+    echo "Get Synapse IntegrationRuntime Connection Info: $name"
+    az synapse integration-runtime get-connection-info --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --name ${name}
+}
 createLinkedService () {
     declare name=$1
     echo "Creating Synapse LinkedService: $name"
@@ -284,17 +294,46 @@ keyVaultLsContent="{
 }"
 echo "$keyVaultLsContent" > ./synapse/workspace/linkedService/Ls_KeyVault_01.json
 
+ 
+# Deploy all Integration Runtimes
+createIntegrationRuntime "Shir-IntegrationRuntime-01"
+getIntegrationRuntimeConnectionInfo "Lsshir01"
+
+# Deploy all Linked Services
 createLinkedService "Ls_KeyVault_01"
 createLinkedService "Ls_AdlsGen2_01"
 createLinkedService "Ls_SqlDb_01"
 createLinkedService "Ls_AzureDatabricks_01"
-createLinkedService "Ls_Rest_MelParkSensors_01"
+createLinkedService "Ls_Onprem_SQLServer"
 
 # Deploy all Datasets
+createDataset "AzureDLStorage_GetMetadataDataset"
+createDataset "AzureDLStorage_input_csv"       
+createDataset "AzureDLStorage_input_parquet"
+createDataset "AzureDLStorage"     
+createDataset "AzureSqlDatabaseExternal_ControlTable"
+createDataset "AzureSqlDatabaseTable"
+createDataset "AzureSynapseAnalyticsTable"
+createDataset "SqlServer_onPremise"      
+createDataset "SqlServer_onPremise_ControlTable"
+                 
+# Deploy all Pipelines
+createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool_parquet" 
+createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool"         
+createPipeline "BulkCopyfrom_AzureSQLdb_to_AzureDLStorage"                   
+createPipeline "BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool"
+createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"  
+createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
+createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb" 
+
+
+# Start Deploy Use Case - Parking Sensor ------------------------------------------
+createLinkedService "Ls_Rest_MelParkSensors_01"
 createDataset "Ds_AdlsGen2_MelbParkingData"
 createDataset "Ds_REST_MelbParkingData"
+createPipeline "P_Ingest_MelbParkingData"
+createTrigger "T_Sched"
 
-# Deploy all Notebooks
 # This line allows the spark pool to be available to attach to the notebooks
 az synapse spark session list --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
 createNotebook "00_setup"
@@ -302,13 +341,6 @@ createNotebook "01a_explore"
 createNotebook "01b_explore_sqlserverless"
 createNotebook "02_standardize"
 createNotebook "03_transform"
-
-
-# Deploy all Pipelines
-createPipeline "P_Ingest_MelbParkingData"
-
-# Deploy triggers
-createTrigger "T_Sched"
 
 # Upload SQL script
 UpdateExternalTableScript
@@ -318,3 +350,4 @@ UpdateExternalTableScript
 UploadSql "create_db_user_template"
 UploadSql "create_external_table"
 echo "Completed deploying Synapse artifacts."
+# End Deploy Use Case - Parking Sensor ------------------------------------------
