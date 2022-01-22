@@ -15,14 +15,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ls_Onprem_SQLServer'"
 		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "@dataset().infilename"
-		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "@concat(dataset().container, '/', dataset().infilefolder)"
-		},
 		"Ls_AdlsGen2_01_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://ag83stdev00006.dfs.core.windows.net"
@@ -30,10 +22,6 @@
 		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://ag83-kv-dev-00006.vault.azure.net/"
-		},
-		"Ls_Rest_MelParkSensors_01_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://data.melbourne.vic.gov.au/resource/"
 		},
 		"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
@@ -82,17 +70,8 @@
 					"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
 						"value": "[parameters('Ls_KeyVault_01_properties_typeProperties_baseUrl')]"
 					},
-					"Ls_Rest_MelParkSensors_01_properties_typeProperties_url": {
-						"value": "[parameters('Ls_Rest_MelParkSensors_01_properties_typeProperties_url')]"
-					},
 					"Lsshir01_properties_typeProperties_linkedInfo_resourceId": {
 						"value": "[parameters('Lsshir01_properties_typeProperties_linkedInfo_resourceId')]"
-					},
-					"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
-						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName')]"
-					},
-					"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
-						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath')]"
 					},
 					"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('Ls_SqlDb_01_properties_typeProperties_connectionString_secretName')]"
@@ -100,6 +79,26 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "ag83-adf-dev-00006_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ag83-adf-dev-00006_ArmTemplate_0')]"
+			]
 		}
 	]
 }

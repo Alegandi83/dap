@@ -11,20 +11,11 @@
 		"Ls_Onprem_SQLServer_connectionString": {
 			"value": ""
 		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
-			"value": "@dataset().infilename"
-		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
-			"value": "@concat(dataset().container, '/', dataset().infilefolder)"
-		},
 		"Ls_AdlsGen2_01_properties_typeProperties_url": {
 			"value": "https://ag83stdev00006.dfs.core.windows.net"
 		},
 		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
 			"value": "https://ag83-kv-dev-00006.vault.azure.net/"
-		},
-		"Ls_Rest_MelParkSensors_01_properties_typeProperties_url": {
-			"value": "https://data.melbourne.vic.gov.au/resource/"
 		},
 		"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
 			"value": "sqlConnectionString"

@@ -15,14 +15,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ls_Onprem_SQLServer'"
 		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "@dataset().infilename"
-		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "@concat(dataset().container, '/', dataset().infilefolder)"
-		},
 		"Ls_AdlsGen2_01_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://ag83stdev00006.dfs.core.windows.net"
@@ -30,10 +22,6 @@
 		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://ag83-kv-dev-00006.vault.azure.net/"
-		},
-		"Ls_Rest_MelParkSensors_01_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://data.melbourne.vic.gov.au/resource/"
 		},
 		"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
@@ -49,90 +37,15 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/P_Ingest_MelbParkingData')]",
+			"name": "[concat(parameters('factoryName'), '/BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Hello from NDC Sydney!!!",
 				"activities": [
 					{
-						"name": "StandardizeData",
-						"description": "",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "DownloadSensorData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "DownloadBayData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/notebooks/02_standardize",
-							"baseParameters": {
-								"infilefolder": {
-									"value": "@variables('infilefolder')",
-									"type": "Expression"
-								},
-								"loadid": {
-									"value": "@pipeline().RunId",
-									"type": "Expression"
-								}
-							},
-							"libraries": [
-								{
-									"egg": "dbfs:/mnt/datalake/sys/databricks/libs/ddo_transform-localdev-py2.py3-none-any.whl"
-								},
-								{
-									"pypi": {
-										"package": "applicationinsights"
-									}
-								}
-							]
-						},
-						"linkedServiceName": {
-							"referenceName": "Ls_AzureDatabricks_01",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Set infilefolder",
-						"type": "SetVariable",
+						"name": "Get Container Folders",
+						"type": "GetMetadata",
 						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "infilefolder",
-							"value": {
-								"value": "@utcnow('yyyy_MM_dd_hh_mm_ss')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "DownloadSensorData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Set infilefolder",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
 						"policy": {
 							"timeout": "7.00:00:00",
 							"retry": 0,
@@ -142,171 +55,124 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010"
-							},
-							"sink": {
-								"type": "AzureBlobFSSink"
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Ds_REST_MelbParkingData",
+							"dataset": {
+								"referenceName": "AzureDLStorage_GetMetadataDataset",
 								"type": "DatasetReference",
 								"parameters": {
-									"relativeurl": "dtpv-d4pf.json"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Ds_AdlsGen2_MelbParkingData",
-								"type": "DatasetReference",
-								"parameters": {
-									"infilefolder": {
-										"value": "@variables('infilefolder')",
+									"SourceContainer": {
+										"value": "@pipeline().parameters.SourceContainer",
 										"type": "Expression"
-									},
-									"infilename": "MelbParkingSensorData.json",
-									"container": "datalake/data/lnd"
-								}
-							}
-						]
-					},
-					{
-						"name": "DownloadBayData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Set infilefolder",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010"
-							},
-							"sink": {
-								"type": "AzureBlobFSSink"
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Ds_REST_MelbParkingData",
-								"type": "DatasetReference",
-								"parameters": {
-									"relativeurl": "wuf8-susg.json"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Ds_AdlsGen2_MelbParkingData",
-								"type": "DatasetReference",
-								"parameters": {
-									"infilefolder": {
-										"value": "@variables('infilefolder')",
-										"type": "Expression"
-									},
-									"infilename": "MelbParkingBayData.json",
-									"container": "datalake/data/lnd"
-								}
-							}
-						]
-					},
-					{
-						"name": "TransformData",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "StandardizeData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/notebooks/03_transform",
-							"baseParameters": {
-								"loadid": {
-									"value": "@pipeline().RunId",
-									"type": "Expression"
-								}
-							},
-							"libraries": [
-								{
-									"egg": "dbfs:/mnt/datalake/sys/databricks/libs/ddo_transform-localdev-py2.py3-none-any.whl"
-								},
-								{
-									"pypi": {
-										"package": "applicationinsights"
 									}
 								}
-							]
-						},
-						"linkedServiceName": {
-							"referenceName": "Ls_AzureDatabricks_01",
-							"type": "LinkedServiceReference"
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
 						}
 					},
 					{
-						"name": "Load SQLDW",
-						"type": "SqlServerStoredProcedure",
+						"name": "ForEachFolder",
+						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "TransformData",
+								"activity": "Get Container Folders",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							}
 						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[load_dw]",
-							"storedProcedureParameters": {
-								"load_id": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
+							"items": {
+								"value": "@activity('Get Container Folders').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "CopyFiles",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
 									},
-									"type": "String"
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"wildcardFolderPath": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"wildcardFileName": "*"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "SqlDWSink",
+											"allowPolyBase": true,
+											"polyBaseSettings": {
+												"rejectValue": 0,
+												"rejectType": "value",
+												"useTypeDefault": true
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": true,
+										"stagingSettings": {
+											"linkedServiceName": {
+												"referenceName": "Ls_AdlsGen2_01",
+												"type": "LinkedServiceReference"
+											},
+											"path": "adfsolutiontemplate/BulkCopyfromFilestoDB"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "AzureDLStorage_input_csv",
+											"type": "DatasetReference",
+											"parameters": {
+												"SourceContainer": {
+													"value": "@pipeline().parameters.SourceContainer",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureSynapseAnalyticsTable",
+											"type": "DatasetReference",
+											"parameters": {
+												"sinkTableName": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"sinkTableSchema": {
+													"value": "@pipeline().parameters.SourceContainer",
+													"type": "Expression"
+												}
+											}
+										}
+									]
 								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "Ls_AzureSQLDW_01",
-							"type": "LinkedServiceReference"
+							]
 						}
 					}
 				],
@@ -314,27 +180,1246 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
-				"variables": {
-					"infilefolder": {
-						"type": "String",
-						"defaultValue": "lnd"
+				"parameters": {
+					"SourceContainer": {
+						"type": "string"
 					}
 				},
 				"folder": {
-					"name": "ParkingSensor"
+					"name": "BulkCopies"
 				},
 				"annotations": [],
-				"lastPublishTime": "2022-01-21T23:25:42Z"
+				"lastPublishTime": "2021-12-12T15:00:26Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_AzureDatabricks_01')]",
-				"[concat(variables('factoryId'), '/datasets/Ds_REST_MelbParkingData')]",
-				"[concat(variables('factoryId'), '/datasets/Ds_AdlsGen2_MelbParkingData')]",
-				"[concat(variables('factoryId'), '/linkedServices/Ls_AzureSQLDW_01')]"
+				"[concat(variables('factoryId'), '/datasets/AzureDLStorage_GetMetadataDataset')]",
+				"[concat(variables('factoryId'), '/datasets/AzureDLStorage_input_csv')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable')]",
+				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ds_AdlsGen2_MelbParkingData')]",
+			"name": "[concat(parameters('factoryName'), '/BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool_parquet')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Container Folders",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "AzureDLStorage_GetMetadataDataset",
+								"type": "DatasetReference",
+								"parameters": {
+									"SourceContainer": {
+										"value": "@pipeline().parameters.SourceContainer",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEachFolder",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Container Folders",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Container Folders').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "CopyFiles",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ParquetSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"wildcardFolderPath": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"wildcardFileName": "*.parquet",
+												"enablePartitionDiscovery": false
+											}
+										},
+										"sink": {
+											"type": "SqlDWSink",
+											"allowPolyBase": true,
+											"polyBaseSettings": {
+												"rejectValue": 0,
+												"rejectType": "value",
+												"useTypeDefault": true
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": true,
+										"stagingSettings": {
+											"linkedServiceName": {
+												"referenceName": "Ls_AdlsGen2_01",
+												"type": "LinkedServiceReference"
+											},
+											"path": "adfsolutiontemplate/BulkCopyfromFilestoDB"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "AzureDLStorage_input_parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"SourceContainer": {
+													"value": "@pipeline().parameters.SourceContainer",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureSynapseAnalyticsTable",
+											"type": "DatasetReference",
+											"parameters": {
+												"sinkTableName": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"sinkTableSchema": {
+													"value": "@pipeline().parameters.SourceContainer",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"SourceContainer": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-12-12T22:06:22Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureDLStorage_GetMetadataDataset')]",
+				"[concat(variables('factoryId'), '/datasets/AzureDLStorage_input_parquet')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable')]",
+				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BulkCopyfrom_AzureSQLdb_to_AzureDLStorage')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy huge amount of data in bulk from database using external control table to store source table list with partitions for each table.\n\nWhen you want to migrate data from your Azure Synapse Analytics like Oracle server, Netezza server, Teradata server or SQL Server to Azure, you have to load huge amount of data from multiple tables in data sources. In most cases, data has to be further partitioned in each table so that you can load rows with multiple threads in parallel from single table.",
+				"activities": [
+					{
+						"name": "GetPartitionList",
+						"description": "Lookup activity to retrieve the list of partitions stored in the external control table.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlSource",
+								"sqlReaderQuery": {
+									"value": "select @{pipeline().parameters.Control_Table_Schema_PartitionID} as PartitionID, \n@{pipeline().parameters.Control_Table_Schema_SourceTableSchema} as SourceTableSchema, \n@{pipeline().parameters.Control_Table_Schema_SourceTableName} as SourceTableName, @{pipeline().parameters.Control_Table_Schema_FilterQuery} as FilterQuery from @{pipeline().parameters.Control_Table_Name}\n\n",
+									"type": "Expression"
+								},
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlDatabaseExternal_ControlTable",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": {
+										"value": "@pipeline().parameters.Control_Table_Name",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachPartition",
+						"description": "ForEach activity to get the partition list from Lookup activity and then iterate each of them to Copy activity. ",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetPartitionList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetPartitionList').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "CopyOnePartition_to_ADLS",
+									"description": "Copy activity to copy each partition from source database store to destination store.",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 0
+									},
+									"inputs": [
+										{
+											"referenceName": "AzureSqlDatabaseTable",
+											"type": "DatasetReference",
+											"parameters": {
+												"sourceTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sourceTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureDLStorage",
+											"type": "DatasetReference",
+											"parameters": {
+												"Data_Destination_Container": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												},
+												"Data_Destination_Directory": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Control_Table_Name": {
+						"type": "String",
+						"defaultValue": "dbo.ControlTableForTemplate"
+					},
+					"Control_Table_Schema_PartitionID": {
+						"type": "String",
+						"defaultValue": "PartitionID"
+					},
+					"Control_Table_Schema_SourceTableName": {
+						"type": "String",
+						"defaultValue": "SourceTableName"
+					},
+					"Control_Table_Schema_FilterQuery": {
+						"type": "String",
+						"defaultValue": "FilterQuery"
+					},
+					"Data_Destination_Container": {
+						"type": "String",
+						"defaultValue": "prova"
+					},
+					"Data_Destination_Directory": {
+						"type": "String",
+						"defaultValue": "radice"
+					},
+					"Control_Table_Schema_SourceTableSchema": {
+						"type": "string",
+						"defaultValue": "SourceTableSchema"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-12-11T13:35:18Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureSqlDatabaseExternal_ControlTable')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqlDatabaseTable')]",
+				"[concat(variables('factoryId'), '/datasets/AzureDLStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BulkCopyfrom_AzureSQLdb_to_SQLServer')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy huge amount of data in bulk from database using external control table to store source table list with partitions for each table.\n\nWhen you want to migrate data from your Azure Synapse Analytics like Oracle server, Netezza server, Teradata server or SQL Server to Azure, you have to load huge amount of data from multiple tables in data sources. In most cases, data has to be further partitioned in each table so that you can load rows with multiple threads in parallel from single table.",
+				"activities": [
+					{
+						"name": "GetPartitionList",
+						"description": "Lookup activity to retrieve the list of partitions stored in the external control table.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlSource",
+								"sqlReaderQuery": {
+									"value": "select @{pipeline().parameters.Control_Table_Schema_PartitionID} as PartitionID, \n@{pipeline().parameters.Control_Table_Schema_SourceTableSchema} as SourceTableSchema,\n@{pipeline().parameters.Control_Table_Schema_SourceTableName} as SourceTableName, @{pipeline().parameters.Control_Table_Schema_FilterQuery} as FilterQuery from @{pipeline().parameters.Control_Table_Name}",
+									"type": "Expression"
+								},
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlDatabaseExternal_ControlTable",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": {
+										"value": "@pipeline().parameters.Control_Table_Name",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachPartition",
+						"description": "ForEach activity to get the partition list from Lookup activity and then iterate each of them to Copy activity. ",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetPartitionList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetPartitionList').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "CopyTable_to_Sqlserver",
+									"description": "Copy activity to copy each partition from source database store to destination store.",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "SqlServerSink",
+											"preCopyScript": {
+												"value": "TRUNCATE TABLE @{item().SourceTableSchema}.@{item().SourceTableName}",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate"
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 0
+									},
+									"inputs": [
+										{
+											"referenceName": "AzureSqlDatabaseTable",
+											"type": "DatasetReference",
+											"parameters": {
+												"sourceTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sourceTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "SqlServer_onPremise",
+											"type": "DatasetReference",
+											"parameters": {
+												"sinkTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sinkTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Control_Table_Name": {
+						"type": "String",
+						"defaultValue": "dbo.ControlTableForTemplate"
+					},
+					"Control_Table_Schema_PartitionID": {
+						"type": "String",
+						"defaultValue": "PartitionID"
+					},
+					"Control_Table_Schema_SourceTableName": {
+						"type": "String",
+						"defaultValue": "SourceTableName"
+					},
+					"Control_Table_Schema_FilterQuery": {
+						"type": "String",
+						"defaultValue": "FilterQuery"
+					},
+					"Data_Destination_Container": {
+						"type": "String",
+						"defaultValue": "prova"
+					},
+					"Data_Destination_Directory": {
+						"type": "String",
+						"defaultValue": "radice"
+					},
+					"Control_Table_Schema_SourceTableSchema": {
+						"type": "string",
+						"defaultValue": "SourceTableSchema"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-10-11T14:49:49Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureSqlDatabaseExternal_ControlTable')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqlDatabaseTable')]",
+				"[concat(variables('factoryId'), '/datasets/SqlServer_onPremise')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy huge amount of data in bulk from database using external control table to store source table list with partitions for each table.\n\nWhen you want to migrate data from your Azure Synapse Analytics like Oracle server, Netezza server, Teradata server or SQL Server to Azure, you have to load huge amount of data from multiple tables in data sources. In most cases, data has to be further partitioned in each table so that you can load rows with multiple threads in parallel from single table.",
+				"activities": [
+					{
+						"name": "GetPartitionList",
+						"description": "Lookup activity to retrieve the list of partitions stored in the external control table.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlSource",
+								"sqlReaderQuery": {
+									"value": "select @{pipeline().parameters.Control_Table_Schema_PartitionID} as PartitionID, \n@{pipeline().parameters.Control_Table_Schema_SourceTableSchema} as SourceTableSchema, \n@{pipeline().parameters.Control_Table_Schema_SourceTableName} as SourceTableName, @{pipeline().parameters.Control_Table_Schema_FilterQuery} as FilterQuery from @{pipeline().parameters.Control_Table_Name}",
+									"type": "Expression"
+								},
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlDatabaseExternal_ControlTable",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": {
+										"value": "@pipeline().parameters.Control_Table_Name",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachPartition",
+						"description": "ForEach activity to get the partition list from Lookup activity and then iterate each of them to Copy activity. ",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetPartitionList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetPartitionList').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "CopyOnePartition_to_SynapseDedicatedPool",
+									"description": "Copy activity to copy each partition from source database store to destination store.",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "SqlDWSink",
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 0
+									},
+									"inputs": [
+										{
+											"referenceName": "AzureSqlDatabaseTable",
+											"type": "DatasetReference",
+											"parameters": {
+												"sourceTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sourceTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureSynapseAnalyticsTable",
+											"type": "DatasetReference",
+											"parameters": {
+												"sinkTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sinkTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Control_Table_Name": {
+						"type": "String",
+						"defaultValue": "dbo.ControlTableForTemplate"
+					},
+					"Control_Table_Schema_PartitionID": {
+						"type": "String",
+						"defaultValue": "PartitionID"
+					},
+					"Control_Table_Schema_SourceTableName": {
+						"type": "String",
+						"defaultValue": "SourceTableName"
+					},
+					"Control_Table_Schema_FilterQuery": {
+						"type": "String",
+						"defaultValue": "FilterQuery"
+					},
+					"Data_Destination_Container": {
+						"type": "String",
+						"defaultValue": "prova"
+					},
+					"Data_Destination_Directory": {
+						"type": "String",
+						"defaultValue": "radice"
+					},
+					"Control_Table_Schema_SourceTableSchema": {
+						"type": "string",
+						"defaultValue": "SourceTableSchema"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-10-03T21:23:32Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureSqlDatabaseExternal_ControlTable')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqlDatabaseTable')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BulkCopyfrom_SQLServer_to_AzureDLStorage')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy huge amount of data in bulk from database using external control table to store source table list with partitions for each table.\n\nWhen you want to migrate data from your Azure Synapse Analytics like Oracle server, Netezza server, Teradata server or SQL Server to Azure, you have to load huge amount of data from multiple tables in data sources. In most cases, data has to be further partitioned in each table so that you can load rows with multiple threads in parallel from single table.",
+				"activities": [
+					{
+						"name": "GetPartitionList",
+						"description": "Lookup activity to retrieve the list of partitions stored in the external control table.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SqlServer_onPremise_ControlTable",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": {
+										"value": "@pipeline().parameters.Control_Table_Name",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachPartition",
+						"description": "ForEach activity to get the partition list from Lookup activity and then iterate each of them to Copy activity. ",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetPartitionList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetPartitionList').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "copy_Sqlserver_to_ADLS",
+									"description": "Copy activity to copy each partition from source database store to destination store.",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".csv"
+											}
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 0
+									},
+									"inputs": [
+										{
+											"referenceName": "SqlServer_onPremise",
+											"type": "DatasetReference",
+											"parameters": {
+												"sinkTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sinkTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureDLStorage",
+											"type": "DatasetReference",
+											"parameters": {
+												"Data_Destination_Container": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												},
+												"Data_Destination_Directory": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Control_Table_Name": {
+						"type": "String",
+						"defaultValue": "ControlTableForTemplate"
+					},
+					"Control_Table_Schema_PartitionID": {
+						"type": "String",
+						"defaultValue": "PartitionID"
+					},
+					"Control_Table_Schema_SourceTableName": {
+						"type": "String",
+						"defaultValue": "SourceTableName"
+					},
+					"Control_Table_Schema_FilterQuery": {
+						"type": "String",
+						"defaultValue": "FilterQuery"
+					},
+					"Data_Destination_Container": {
+						"type": "String",
+						"defaultValue": "prova"
+					},
+					"Data_Destination_Directory": {
+						"type": "String",
+						"defaultValue": "radice"
+					},
+					"Control_Table_Schema_SourceTableSchema": {
+						"type": "string",
+						"defaultValue": "SourceTableSchema"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-12-12T15:23:35Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SqlServer_onPremise_ControlTable')]",
+				"[concat(variables('factoryId'), '/datasets/SqlServer_onPremise')]",
+				"[concat(variables('factoryId'), '/datasets/AzureDLStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BulkCopyfrom_SQLServer_to_AzureSQLdb')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy huge amount of data in bulk from database using external control table to store source table list with partitions for each table.\n\nWhen you want to migrate data from your Azure Synapse Analytics like Oracle server, Netezza server, Teradata server or SQL Server to Azure, you have to load huge amount of data from multiple tables in data sources. In most cases, data has to be further partitioned in each table so that you can load rows with multiple threads in parallel from single table.",
+				"activities": [
+					{
+						"name": "GetPartitionList",
+						"description": "Lookup activity to retrieve the list of partitions stored in the external control table.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SqlServer_onPremise_ControlTable",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": {
+										"value": "@pipeline().parameters.Control_Table_Name",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachPartition",
+						"description": "ForEach activity to get the partition list from Lookup activity and then iterate each of them to Copy activity. ",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetPartitionList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetPartitionList').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "CopyOnePartition_to_Sqlserver",
+									"description": "Copy activity to copy each partition from source database store to destination store.",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "TRUNCATE TABLE @{item().SourceTableSchema}.@{item().SourceTableName}",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 0
+									},
+									"inputs": [
+										{
+											"referenceName": "SqlServer_onPremise",
+											"type": "DatasetReference",
+											"parameters": {
+												"sinkTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sinkTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureSqlDatabaseTable",
+											"type": "DatasetReference",
+											"parameters": {
+												"sourceTableName": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"sourceTableSchema": {
+													"value": "@item().SourceTableSchema",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Control_Table_Name": {
+						"type": "String",
+						"defaultValue": "ControlTableForTemplate"
+					},
+					"Control_Table_Schema_PartitionID": {
+						"type": "String",
+						"defaultValue": "PartitionID"
+					},
+					"Control_Table_Schema_SourceTableName": {
+						"type": "String",
+						"defaultValue": "SourceTableName"
+					},
+					"Control_Table_Schema_FilterQuery": {
+						"type": "String",
+						"defaultValue": "FilterQuery"
+					},
+					"Data_Destination_Container": {
+						"type": "String",
+						"defaultValue": "prova"
+					},
+					"Data_Destination_Directory": {
+						"type": "String",
+						"defaultValue": "radice"
+					},
+					"Control_Table_Schema_SourceTableSchema": {
+						"type": "string",
+						"defaultValue": "SourceTableSchema"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-10-11T14:49:49Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SqlServer_onPremise_ControlTable')]",
+				"[concat(variables('factoryId'), '/datasets/SqlServer_onPremise')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqlDatabaseTable')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/loadData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Ingest_SQLS_to_ADLS",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "BulkCopyfrom_SQLServer_to_AzureDLStorage",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Control_Table_Name": "ControlTableForTemplate",
+								"Control_Table_Schema_PartitionID": "PartitionID",
+								"Control_Table_Schema_SourceTableName": "SourceTableName",
+								"Control_Table_Schema_FilterQuery": "FilterQuery",
+								"Data_Destination_Container": "prova",
+								"Data_Destination_Directory": "radice",
+								"Control_Table_Schema_SourceTableSchema": "SourceTableSchema"
+							}
+						}
+					},
+					{
+						"name": "Process_ADLS_to_Syn",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Ingest_SQLS_to_ADLS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"SourceContainer": "hpi"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "healthcare_infoProtection"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/BulkCopyfrom_SQLServer_to_AzureDLStorage')]",
+				"[concat(variables('factoryId'), '/pipelines/BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDLStorage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your data destination store.",
+				"linkedServiceName": {
+					"referenceName": "Ls_AdlsGen2_01",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Data_Destination_Container": {
+						"type": "String"
+					},
+					"Data_Destination_Directory": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@{dataset().Data_Destination_Directory}",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@{dataset().Data_Destination_Container}",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDLStorage_GetMetadataDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your source data store.",
+				"linkedServiceName": {
+					"referenceName": "Ls_AdlsGen2_01",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SourceContainer": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": {
+							"value": "@dataset().SourceContainer",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDLStorage_input_csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your source data store.",
+				"linkedServiceName": {
+					"referenceName": "Ls_AdlsGen2_01",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SourceContainer": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": {
+							"value": "@dataset().SourceContainer",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDLStorage_input_parquet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -343,70 +1428,209 @@
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"infilefolder": {
-						"type": "String"
-					},
-					"infilename": {
-						"type": "String"
-					},
-					"container": {
-						"type": "String",
-						"defaultValue": "datalake/data/lnd"
+					"SourceContainer": {
+						"type": "string"
 					}
 				},
 				"folder": {
-					"name": "ParkingSensor"
+					"name": "BulkCopies"
 				},
 				"annotations": [],
-				"type": "AzureBlobFSFile",
+				"type": "Parquet",
 				"typeProperties": {
-					"format": {
-						"type": "JsonFormat",
-						"filePattern": "arrayOfObjects"
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": {
+							"value": "@dataset().SourceContainer",
+							"type": "Expression"
+						}
 					},
-					"fileName": {
-						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName')]",
-						"type": "Expression"
-					},
-					"folderPath": {
-						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath')]",
-						"type": "Expression"
-					}
-				}
+					"compressionCodec": "snappy"
+				},
+				"schema": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ds_REST_MelbParkingData')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabaseExternal_ControlTable')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "The external control table is used to store the partition list of data source tables.",
 				"linkedServiceName": {
-					"referenceName": "Ls_Rest_MelParkSensors_01",
+					"referenceName": "Ls_SqlDb_01",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"relativeurl": {
+					"TableName": {
 						"type": "String"
 					}
 				},
 				"folder": {
-					"name": "ParkingSensor"
+					"name": "BulkCopies"
 				},
 				"annotations": [],
-				"type": "RestResource",
+				"type": "AzureSqlTable",
+				"schema": [],
 				"typeProperties": {
-					"relativeUrl": {
-						"value": "@dataset().relativeurl",
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().TableName",
 						"type": "Expression"
-					},
-					"requestMethod": "GET"
+					}
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_Rest_MelParkSensors_01')]"
+				"[concat(variables('factoryId'), '/linkedServices/Ls_SqlDb_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabaseTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your data source store.",
+				"linkedServiceName": {
+					"referenceName": "Ls_SqlDb_01",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"sourceTableName": {
+						"type": "string"
+					},
+					"sourceTableSchema": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().sourceTableSchema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().sourceTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_SqlDb_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ls_AzureSQLDW_01",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"sinkTableName": {
+						"type": "string"
+					},
+					"sinkTableSchema": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().sinkTableSchema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().sinkTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_AzureSQLDW_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServer_onPremise')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ls_Onprem_SQLServer",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"sinkTableName": {
+						"type": "string"
+					},
+					"sinkTableSchema": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().sinkTableSchema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().sinkTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_Onprem_SQLServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServer_onPremise_ControlTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ls_Onprem_SQLServer",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TableName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BulkCopies"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "hpi",
+					"table": {
+						"value": "@dataset().TableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_Onprem_SQLServer')]"
 			]
 		},
 		{
@@ -490,21 +1714,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ls_Rest_MelParkSensors_01')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('Ls_Rest_MelParkSensors_01_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Ls_SqlDb_01')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -524,36 +1733,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault_01')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/T_Sched')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "P_Ingest_MelbParkingData",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 1,
-						"startTime": "2019-02-01T05:28:00Z",
-						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/P_Ingest_MelbParkingData')]"
 			]
 		},
 		{
