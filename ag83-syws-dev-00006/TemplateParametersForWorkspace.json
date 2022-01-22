@@ -1,0 +1,37 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "ag83-syws-dev-00006"
+		},
+		"Ls_Onprem_SQLServer_connectionString": {
+			"value": ""
+		},
+		"ag83-syws-dev-00006-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"Ls_AdlsGen2_01_properties_typeProperties_url": {
+			"value": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Ls_KeyVault_01",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "datalakeurl"
+			}
+		},
+		"Ls_AdlsGen2_02_properties_typeProperties_url": {
+			"value": "https://ag83stdev00006.dfs.core.windows.net"
+		},
+		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
+			"value": "https://ag83-kv-dev-00006.vault.azure.net/"
+		},
+		"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
+			"value": "sqlConnectionString"
+		},
+		"ag83-syws-dev-00006-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://ag83st2dev00006.dfs.core.windows.net"
+		}
+	}
+}

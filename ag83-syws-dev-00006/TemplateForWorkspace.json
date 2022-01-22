@@ -1,0 +1,932 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "ag83-syws-dev-00006"
+		},
+		"Ls_Onprem_SQLServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ls_Onprem_SQLServer'"
+		},
+		"ag83-syws-dev-00006-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ag83-syws-dev-00006-WorkspaceDefaultSqlServer'"
+		},
+		"Ls_AdlsGen2_01_properties_typeProperties_url": {
+			"type": "object",
+			"defaultValue": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Ls_KeyVault_01",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "datalakeurl"
+			}
+		},
+		"Ls_AdlsGen2_02_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ag83stdev00006.dfs.core.windows.net"
+		},
+		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://ag83-kv-dev-00006.vault.azure.net/"
+		},
+		"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "sqlConnectionString"
+		},
+		"ag83-syws-dev-00006-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ag83st2dev00006.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/Ls_AdlsGen2_01')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "AzureBlobFS",
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				},
+				"annotations": [],
+				"typeProperties": {
+					"url": "[parameters('Ls_AdlsGen2_01_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Ls_KeyVault_01')]",
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Ls_AdlsGen2_02')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Ls_AdlsGen2_02_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Ls_AzureDatabricks_01')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-1354948144884338.18.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/ag83-00006-dev-rg/providers/Microsoft.Databricks/workspaces/ag83-dbw-dev-00006",
+					"newClusterNodeType": "Standard_DS3_v2",
+					"newClusterNumOfWorker": "1",
+					"newClusterSparkEnvVars": {
+						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+					},
+					"newClusterVersion": "7.3.x-scala2.12",
+					"newClusterInitScripts": []
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Ls_KeyVault_01')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('Ls_KeyVault_01_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Ls_Onprem_SQLServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('Ls_Onprem_SQLServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "Lsshir01",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/Lsshir01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Ls_SqlDb_01')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Ls_KeyVault_01",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('Ls_SqlDb_01_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/linkedServices/Ls_KeyVault_01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ag83-syws-dev-00006-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('ag83-syws-dev-00006-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ag83-syws-dev-00006-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ag83-syws-dev-00006-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Lsshir01')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2 HealthCare SQL Pool Security RLS DDM')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/analysis"
+				},
+				"content": {
+					"query": "/******Important – Do not use in production, for demonstration purposes only – please review the legal notices by clicking the following link****/\n---DisclaimerLink:  https://healthcaredemoapp.azurewebsites.net/#/disclaimer\n---License agreement: https://github.com/microsoft/Azure-Analytics-and-AI-Engagement/blob/main/HealthCare/License.md\n\n/* **DISCLAIMER**\nBy accessing this code, you acknowledge the code is made available for presentation and demonstration purposes only and that the code: (1) is not subject to SOC 1 and SOC 2 compliance audits; (2) is not designed or intended to be a substitute for the professional advice, diagnosis, treatment, or judgment of a certified financial services professional; (3) is not designed, intended or made available as a medical device; and (4) is not designed or intended to be a substitute for professional medical advice, diagnosis, treatment or judgement. Do not use this code to replace, substitute, or provide professional financial advice or judgment, or to replace, substitute or provide medical advice, diagnosis, treatment or judgement. You are solely responsible for ensuring the regulatory, legal, and/or contractual compliance of any use of the code, including obtaining any authorizations or consents, and any solution you choose to build that incorporates this code in whole or in part. */\n\n/* Row level Security (RLS) in Azure Synapse enables us to use group membership to control access to rows in a table.\n\tAzure Synapse applies the access restriction every time the data access is attempted from any user. \n\tLet see how we can implement row level security and Dynamic Data Masking in Azure Synapse.*/\n\n--Step 1\nSELECT count(*) as 'TotalEmp' FROM dbo.HospitalEmpPIIData ; \nSELECT * FROM dbo.HospitalEmpPIIData ;\n\n-- Step 2 Let now test the filtering predicate (for state), by selecting data from the HospitalEmpPIIData table as Your Alias\n-- ChiefOperatingManager 'Spencer' should be able to see all rows in the table.\n-- Spencer is logged in as demo-healthcare-user.\nEXECUTE AS USER ='demo-healthcare-user@cloudlabsai.ms'\nSELECT count(*) as 'TotalEmp' FROM dbo.HospitalEmpPIIData ;\nSELECT * FROM dbo.HospitalEmpPIIData;\nrevert\n\n-- Step 3 Let us test the same for other user.\n-- CareManager 'Jim' should be able to see only Miami State and BillingStaff Data in the table.\n-- Jim is logged in as demo-healthcare-user-02.\nEXECUTE AS USER ='demo-healthcare-user-02@cloudlabsai.ms'\nSELECT count(*) as 'TotalEmp' FROM dbo.HospitalEmpPIIData ;\nSELECT \n    *\nFROM \n    dbo.HospitalEmpPIIData ;\nrevert\n\n\n\n\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/4a HealthCare SQL Pool Security DDM')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/analysis"
+				},
+				"content": {
+					"query": "/******Important – Do not use in production, for demonstration purposes only – please review the legal notices by clicking the following link****/\n---DisclaimerLink:  https://healthcaredemoapp.azurewebsites.net/#/disclaimer\n---License agreement: https://github.com/microsoft/Azure-Analytics-and-AI-Engagement/blob/main/HealthCare/License.md\n\n/* **DISCLAIMER**\nBy accessing this code, you acknowledge the code is made available for presentation and demonstration purposes only and that the code: (1) is not subject to SOC 1 and SOC 2 compliance audits; (2) is not designed or intended to be a substitute for the professional advice, diagnosis, treatment, or judgment of a certified financial services professional; (3) is not designed, intended or made available as a medical device; and (4) is not designed or intended to be a substitute for professional medical advice, diagnosis, treatment or judgement. Do not use this code to replace, substitute, or provide professional financial advice or judgment, or to replace, substitute or provide medical advice, diagnosis, treatment or judgement. You are solely responsible for ensuring the regulatory, legal, and/or contractual compliance of any use of the code, including obtaining any authorizations or consents, and any solution you choose to build that incorporates this code in whole or in part. */\n\n-- Step:1(View the existing table 'PatientInformation' Data) \nselect top 100 * from PatientInformation\n\n-- Step:2 Let's confirm that there are no Dynamic Data Masking (DDM) applied on columns\nExec [Confirm_DDM]\n-- No results returned verify that no data masking has been done yet.\n\n-- Step:3 Now lets mask 'Medical Insurance Card' and 'Email' Column of 'PatientInformation' table.\nALTER TABLE PatientInformation  \nALTER COLUMN [Medical Insurance Card] ADD MASKED WITH (FUNCTION = 'partial(0,\"XXX-XXX-XXXX-\",4)')\nGO\nALTER TABLE PatientInformation \nALTER COLUMN Email ADD MASKED WITH (FUNCTION = 'email()')\nGO\n-- The columns are sucessfully masked.\n\n-- Step:4 Let's see Dynamic Data Masking (DDM) applied on the two columns.\nExec [Confirm_DDM]\n\n-- Step:5 Now, let us grant SELECT permission to 'CareManager'sysusers on the 'PatientInformation' table.\nSELECT Name as [User] FROM sys.sysusers WHERE name = N'CareManager'\nGRANT SELECT ON PatientInformation TO CareManager;  \n\n-- Step:6 Logged in as  'CareManager' let us execute the select query and view the result.\nEXECUTE AS USER =N'CareManager';  \nSELECT  * FROM PatientInformation; \n\n-- Step:7 Let us Remove the data masking using UNMASK permission\nGRANT UNMASK TO CareManager\nEXECUTE AS USER = 'CareManager';  \nSELECT top 10 * FROM PatientInformation; \nrevert; \nREVOKE UNMASK TO CareManager;  \n\n----step:8 Reverting all the changes back to as it was.\nALTER TABLE PatientInformation\nALTER COLUMN [Medical Insurance Card] DROP MASKED;\nGO\nALTER TABLE PatientInformation\nALTER COLUMN Email DROP MASKED;\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/4b HealthCare SQL Pool Security RLS')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/analysis"
+				},
+				"content": {
+					"query": "/******Important – Do not use in production, for demonstration purposes only – please review the legal notices by clicking the following link****/\n---DisclaimerLink:  https://healthcaredemoapp.azurewebsites.net/#/disclaimer\n---License agreement: https://github.com/microsoft/Azure-Analytics-and-AI-Engagement/blob/main/HealthCare/License.md\n\n/* **DISCLAIMER**\nBy accessing this code, you acknowledge the code is made available for presentation and demonstration purposes only and that the code: (1) is not subject to SOC 1 and SOC 2 compliance audits; (2) is not designed or intended to be a substitute for the professional advice, diagnosis, treatment, or judgment of a certified financial services professional; (3) is not designed, intended or made available as a medical device; and (4) is not designed or intended to be a substitute for professional medical advice, diagnosis, treatment or judgement. Do not use this code to replace, substitute, or provide professional financial advice or judgment, or to replace, substitute or provide medical advice, diagnosis, treatment or judgement. You are solely responsible for ensuring the regulatory, legal, and/or contractual compliance of any use of the code, including obtaining any authorizations or consents, and any solution you choose to build that incorporates this code in whole or in part. */\n\n/*\tRow level Security (RLS) in Azure Synapse enables us to use group membership to control access to rows in a table.\n\tAzure Synapse applies the access restriction every time the data access is attempted from any user. \n\tLet see how we can implement row level security in Azure Synapse.*/\n\n----------------------------------Row-Level Security (RLS), 1: Filter predicates------------------------------------------------------------------\n-- Step:1 The [HealthCare-FactSales] table has two Analyst values i.e. CareManagerMiami and CareManagerLosAngeles\nSELECT top 100 * FROM [HealthCare-FactSales] order by City ;\n\n/* Moving ahead, we Create a new schema, and an inline table-valued function. \nThe function returns 1 when a row in the Analyst column is the same as the user executing the query (@Analyst = USER_NAME())\n or if the user executing the query is the ChiefOperatingManager user (USER_NAME() = 'ChiefOperatingManager').\n*/\n\n--Step:2 To set up RLS, the following query creates three login users :  ChiefOperatingManager, CareManagerMiami, CareManagerLosAngeles\nExec Sp_HealthCareRLS\nGO\nCREATE SCHEMA Security\nGO\nCREATE FUNCTION Security.fn_securitypredicate(@Analyst AS sysname)  \n    RETURNS TABLE  \nWITH SCHEMABINDING  \nAS  \n    RETURN SELECT 1 AS fn_securitypredicate_result\nWHERE @Analyst = USER_NAME() OR USER_NAME() = 'ChiefOperatingManager'\nGO\n-- Now we define security policy that allows users to filter rows based on thier login name.\nCREATE SECURITY POLICY SalesFilter  \nADD FILTER PREDICATE Security.fn_securitypredicate(CareManager)\nON dbo.[HealthCare-FactSales]\nWITH (STATE = ON);\n------ Allow SELECT permissions to the fn_securitypredicate function.------\nGRANT SELECT ON security.fn_securitypredicate TO ChiefOperatingManager, CareManagerMiami, CareManagerLosAngeles;\n\n\n-- Step:3 Let us now test the filtering predicate, by selecting data from the [HealthCare-FactSales] table as 'CareManagerMiami' user.\nEXECUTE AS USER = 'CareManagerMiami'; \nSELECT * FROM [HealthCare-FactSales];\nrevert;\n-- As we can see, the query has returned rows here Login name is CareManagerMiami\n\n-- Step:4 Let us test the same for  'CareManagerLosAngeles' user.\nEXECUTE AS USER = 'CareManagerLosAngeles'; \nSELECT * FROM [HealthCare-FactSales];\nrevert;\n-- RLS is working indeed.\n\n-- Step:5 The ChiefOperatingManager should be able to see all rows in the table.\nEXECUTE AS USER = 'ChiefOperatingManager';  \nSELECT * FROM [HealthCare-FactSales];\nrevert;\n-- And he can.\n\n--Step:6 To disable the security policy we just created above, we execute the following.\nALTER SECURITY POLICY SalesFilter  \nWITH (STATE = OFF);\n\nDROP SECURITY POLICY SalesFilter;\nDROP FUNCTION Security.fn_securitypredicate;\nDROP SCHEMA Security;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/5 HealthCare SQL Pool Security CLS')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/analysis"
+				},
+				"content": {
+					"query": "/******Important – Do not use in production, for demonstration purposes only – please review the legal notices by clicking the following link****/\n---DisclaimerLink:  https://healthcaredemoapp.azurewebsites.net/#/disclaimer\n---License agreement: https://github.com/microsoft/Azure-Analytics-and-AI-Engagement/blob/main/HealthCare/License.md\n/*  Column-level security feature in Azure Synapse simplifies the design and coding of security in application. \n    It ensures column level security by restricting column access to protect sensitive data. */\n\n--Step 1: Let us see how this feature in Azure Synapse works. Before that let us have a look at the Mkt_CampaignAnalyticLatest table. \nselect  Top 100 * from Mkt_CampaignAnalyticLatest\n\n/*  Consider a scenario where there are two users. \n    A ChiefOperatingManager, who is an authorized  personnel with access to all the information in the database \n    and a CareManager, to whom only required information should be presented.*/\n\n-- Step:2 We look for the names “ChiefOperatingManager” and “CareManagerMiami” present in the Datawarehouse. \nSELECT Name as [User] FROM sys.sysusers WHERE name IN (N'ChiefOperatingManager',N'CareManagerMiami')\n\n-- Step:3 Now let us enforcing column level security for the CareManagerMiami. \n/*  Let us see how.\n    The Mkt_CampaignAnalyticLatest table in the warehouse has information like Region, Country,Campaign_Name, Revenue_Target , and Revenue.\n    Of all the information, Revenue generated from every Mkt_CampaignAnalyticLatest is a classified one and should be hidden from CareManagerMiami.\n    To conceal this information, we execute the following query: */\n\nGRANT SELECT ON Mkt_CampaignAnalyticLatest ([Region],[Country],[Campaign_Name],[Revenue_Target]) TO CareManagerMiami;\n-- This provides CareManagerMiami access to all the columns of the Mkt_CampaignAnalyticLatest table but Revenue.\n-- Step:4 Then, to check if the security has been enforced, we execute the following query with current User As 'CareManagerMiami'\nEXECUTE AS USER ='CareManagerMiami'\nselect * from Mkt_CampaignAnalyticLatest\n---\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target] from Mkt_CampaignAnalyticLatest\n\n/*  And look at that, when the user logged in as CareManagerMiami tries to view all the columns from the Mkt_CampaignAnalyticLatest table, \n    he is prompted with a ‘permission denied error’ on Revenue column.*/\n\n-- Step:5 Whereas, the ChiefOperatingManager of the company should be authorized with all the information present in the warehouse.To do so, we execute the following query.\nRevert;\nGRANT SELECT ON Mkt_CampaignAnalyticLatest TO ChiefOperatingManager;  --Full access to all columns.\n\n-- Step:6 Let us check if our ChiefOperatingManager user can see all the information that is present. Assign Current User As 'ChiefOperatingManager' and the execute the query\nEXECUTE AS USER ='ChiefOperatingManager'\nselect * from Mkt_CampaignAnalyticLatest\n\n-------------------------------------------------------------\nRevert;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/6 Set up Script RLS DDM')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/analysis"
+				},
+				"content": {
+					"query": "/******Important – Do not use in production, for demonstration purposes only – please review the legal notices by clicking the following link****/\n---DisclaimerLink:  https://healthcaredemoapp.azurewebsites.net/#/disclaimer\n---License agreement: https://github.com/microsoft/Azure-Analytics-and-AI-Engagement/blob/main/HealthCare/License.md\n\n/* **DISCLAIMER**\nBy accessing this code, you acknowledge the code is made available for presentation and demonstration purposes only and that the code: (1) is not subject to SOC 1 and SOC 2 compliance audits; (2) is not designed or intended to be a substitute for the professional advice, diagnosis, treatment, or judgment of a certified financial services professional; (3) is not designed, intended or made available as a medical device; and (4) is not designed or intended to be a substitute for professional medical advice, diagnosis, treatment or judgement. Do not use this code to replace, substitute, or provide professional financial advice or judgment, or to replace, substitute or provide medical advice, diagnosis, treatment or judgement. You are solely responsible for ensuring the regulatory, legal, and/or contractual compliance of any use of the code, including obtaining any authorizations or consents, and any solution you choose to build that incorporates this code in whole or in part. */\n\nselect  * from [dbo].[HospitalEmpPIIData] \n\n/*****************************************************************************************************************/\n/*****************************************************************************************************************/\n\n-- 2. Setting up Row Level Security on State\n--Create User and Grant Select Permissions\n\n\nIf Not Exists (SELECT Name as [User] FROM sys.sysusers WHERE name='demo-healthcare-user@cloudlabsai.ms') \nCREATE USER [demo-healthcare-user@cloudlabsai.ms] FROM EXTERNAL PROVIDER\nGRANT SELECT ON dbo.HospitalEmpPIIData TO [demo-healthcare-user@cloudlabsai.ms] \nEXEC sp_addrolemember 'db_datareader', 'demo-healthcare-user@cloudlabsai.ms'\n\nIf Not Exists (SELECT Name as [User] FROM sys.sysusers WHERE name='demo-healthcare-user-02@cloudlabsai.ms') \nCREATE USER [demo-healthcare-user-02@cloudlabsai.ms] FROM EXTERNAL PROVIDER\nGRANT SELECT ON dbo.HospitalEmpPIIData TO [demo-healthcare-user-02@cloudlabsai.ms] \nEXEC sp_addrolemember 'db_datareader', 'demo-healthcare-user-02@cloudlabsai.ms'\n\n\n--Grant Impersonate permissions for AAD login \nGRANT IMPERSONATE ON USER::[demo-healthcare-user-02@cloudlabsai.ms] TO [demo-healthcare-user@cloudlabsai.ms];\nGRANT IMPERSONATE ON USER::[demo-healthcare-user@cloudlabsai.ms] TO [demo-healthcare-user-02@cloudlabsai.ms];\n\n--REVOKE CONTROL ON USER::[demo-healthcare-user@cloudlabsai.ms] FROM HospitalEmpPIIData;\n--Create roles as values present in column \n--CREATE ROLE [DE]; --This role already exists for SQL login\n\nIf Not EXISTS (\nSELECT DP1.name AS DatabaseRoleName FROM sys.database_role_members AS DRM  \nRIGHT OUTER JOIN sys.database_principals AS DP1 ON DRM.role_principal_id = DP1.principal_id  \nLEFT OUTER JOIN sys.database_principals AS DP2 ON DRM.member_principal_id = DP2.principal_id  \nWHERE DP1.type = 'R' and DP1.Name in ('Miami','NY','PA') )\n CREATE ROLE [CA];\n\nIf Not EXISTS (\nSELECT DP1.name AS DatabaseRoleName FROM sys.database_role_members AS DRM  \nRIGHT OUTER JOIN sys.database_principals AS DP1 ON DRM.role_principal_id = DP1.principal_id  \nLEFT OUTER JOIN sys.database_principals AS DP2 ON DRM.member_principal_id = DP2.principal_id  \nWHERE DP1.type = 'R' and DP1.Name in ('CA','NY','PA') ) \nCREATE ROLE [PA];\n\nIf Not EXISTS (\nSELECT DP1.name AS DatabaseRoleName FROM sys.database_role_members AS DRM  \nRIGHT OUTER JOIN sys.database_principals AS DP1 ON DRM.role_principal_id = DP1.principal_id  \nLEFT OUTER JOIN sys.database_principals AS DP2 ON DRM.member_principal_id = DP2.principal_id  \nWHERE DP1.type = 'R' and DP1.Name in ('CA','NY','PA') )\nCREATE ROLE [NY];\n    \n\n-- Add AAD users to roles      \nEXEC sp_addrolemember 'NY', 'demo-healthcare-user@cloudlabsai.ms';\nEXEC sp_addrolemember 'PA', 'demo-healthcare-user@cloudlabsai.ms';\nEXEC sp_addrolemember 'CA', 'demo-healthcare-user@cloudlabsai.ms';\nEXEC sp_addrolemember 'CA', 'demo-healthcare-user-02@cloudlabsai.ms';\n\nCREATE FUNCTION dbo.fn_securitypredicate_rolemember(@State AS sysname)  \nRETURNS TABLE  WITH SCHEMABINDING  \nAS  \nRETURN SELECT 1 AS fn_securitypredicate_result   \nWHERE \n    (@State = 'NY' and IS_ROLEMEMBER('NY') = 1) \n    or (@State = 'CA' and IS_ROLEMEMBER('CA') = 1) \n    or (@State = 'PA' and IS_ROLEMEMBER('PA') = 1)\n    or IS_ROLEMEMBER('dbo') = 1; \n\n--Create Security Policy to filter rows based on column values \nCREATE SECURITY POLICY StateFilter_rolemember \nADD FILTER PREDICATE dbo.fn_securitypredicate_rolemember([state])   \nON  dbo.HospitalEmpPIIData WITH (STATE = ON);        \n\n\nALTER SECURITY POLICY StateFilter_rolemember  \nWITH (STATE = OFF);\nDROP SECURITY POLICY StateFilter_rolemember; \nDROP FUNCTION Security.fn_securitypredicate_rolemember\nDROP SCHEMA Security;\n\n/*****************************************************************************************************************/\n-- 3. Setting up Dynamic Data Masking on EmailId column of dbo.HospitalEmpPIIData\n\n        ALTER TABLE dbo.HospitalEmpPIIData  \n        ALTER COLUMN Email varchar(100) MASKED WITH (FUNCTION = 'Email()'); \n\n        ALTER TABLE dbo.HospitalEmpPIIData  \n        ALTER COLUMN SSN varchar(100) MASKED WITH (FUNCTION = 'partial(0,\"XXX-XX\",2)'); \n\n/********************  Column Level Encryption Set Up ******************/\n\t--Note:\n\t--Once CLE is enabled on SQL Pool, login with AAD login and execute all commands as provided below.\n\t--When executing with Synapse Studio, open symmetric key and select statement should be executed as a single query by selecting it.\n\n/*************************************************************************************************/\n\n\n--If your database does not already have a database master key, create one by executing the following statement providing your password else alter key\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = 'eT!ePieU*RV@' --master key password\n--ALTER MASTER KEY REGENERATE WITH ENCRYPTION BY PASSWORD = 'eT!ePieU*RV@' --alter master key password\n\n--Verify Master Key is created\nSELECT * FROM sys.symmetric_keys\n\n--Grant control permisisons on database and create certificate permissions to user\ngrant control on database::HealthCareDW to [demo-healthcare-user@cloudlabsai.ms]\ngrant create certificate to [demo-healthcare-user@cloudlabsai.ms]\n\n--Create a new certificate with date options\nCREATE CERTIFICATE Cert1 \n\tencryption by password = 'm9p!T!zJN9#N' --cert password\n\tWITH SUBJECT = 'CLE Cert',--cert subject\n\tSTART_DATE = '20200512', \n\tEXPIRY_DATE = '20400512'\n--Verify cert creation\nSELECT * FROM sys.certificates\n\n--Create a new asymmetric key\nCREATE ASYMMETRIC KEY Akey1\n\tWITH ALGORITHM = RSA_3072\n\tENCRYPTION BY PASSWORD = '$T62uDCKP$iq' --asymmetric key password\n--Verify asymmetric key creation\nSELECT * FROM sys.asymmetric_keys\n\n--Create symmetric key with encryption by certificate, password, and asymmetric key\nCREATE SYMMETRIC KEY Key1\n\tWITH \n\tKEY_SOURCE = 'key source',\n\tIDENTITY_VALUE = 'identity value',\n\tALGORITHM = AES_192\n\tENCRYPTION BY certificate Cert1, asymmetric key Akey1, password = 'Vhqiv4SyW$j7' --symmetric key password\n\n\n\n/************* for wwi.HospitalEmpPIIData *******************/\n\n\n---Create a new table with or alter a table to add a column for the encrypted data\n\nALTER TABLE [dbo].[HospitalEmpPIIData] ADD SSN_encrypted varbinary(128)\n\n--Open the symmetric key as a first step to encrypting the column\nOPEN SYMMETRIC KEY Key1 DECRYPTION by CERTIFICATE Cert1 WITH password = 'm9p!T!zJN9#N' --cert password\n\n--Verify the key is open\n--Select * from sys.openkeys\n\n--Encrypt the column data with the symmetric key\nUPDATE [dbo].[HospitalEmpPIIData] SET SSN_encrypted = convert(varbinary(128), ENCRYPTBYKEY(Key_Guid('Key1'), SSN)) \n--Verify the column data is encrypted\nSelect * from [dbo].[HospitalEmpPIIData] where Id<50\n\n\n-- To validate encryption and decryption\nOPEN SYMMETRIC KEY Key1 DECRYPTION by CERTIFICATE Cert1 WITH password = 'm9p!T!zJN9#N' --cert password\n--Decrypt the column data\nSELECT SSN_encrypted, CONVERT(NVARCHAR, DECRYPTBYKEY(SSN_Encrypted)) AS [SSN_decrypted] FROM [wwi].[HospitalEmpPIIData]\n--Close the symmetric key\nCLOSE SYMMETRIC KEY Key1\n\n\n--drop original ssn column\nALTER TABLE [wwi].[HospitalEmpPIIData] drop column SSN;\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CLS_ChiefOperatingManager')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_ChiefOperatingManager] AS \nRevert;\nGRANT SELECT ON Campaign_Analytics TO ChiefOperatingManager;  --Full access to all columns.\n-- Step:6 Let us check if our ChiefOperatingManager user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\nEXECUTE AS USER ='ChiefOperatingManager'\nselect * from Campaign_Analytics\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CLS_DAM_AC_New')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_DAM_AC_New] AS \nGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State]) TO CareManagerMiami;\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State] from Campaign_Analytics\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CLS_DAM_F_New')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_DAM_F_New] AS \nBEGIN TRY\n-- Generate a divide-by-zero error  \n\t\n\t\tGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[CITY],[State]) TO CareManagerMiami;\n\t\tEXECUTE AS USER ='CareManagerMiami'\n\t\tselect * from Campaign_Analytics\nEND TRY\nBEGIN CATCH\n\tSELECT\n\t\tERROR_NUMBER() AS ErrorNumber,\n\t\tERROR_STATE() AS ErrorState,\n\t\tERROR_SEVERITY() AS ErrorSeverity,\n\t\tERROR_PROCEDURE() AS ErrorProcedure,\n\t\t\n\t\tERROR_MESSAGE() AS ErrorMessage;\nEND CATCH;\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Confirm_DDM')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\n\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE PROC [dbo].[Confirm_DDM] AS \nSELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \nFROM sys.masked_columns AS c  \nJOIN sys.tables AS tbl   ON c.[object_id] = tbl.[object_id]  WHERE is_masked = 1;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SP_RLS_CareManagerLosAngeles')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_CareManagerLosAngeles] AS\nEXECUTE AS USER = 'CareManagerLosAngeles'; \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SP_RLS_CareManagerMiami')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_CareManagerMiami] AS\nEXECUTE AS USER = 'CareManagerMiami' \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SP_RLS_ChiefOperatingManager')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_ChiefOperatingManager] AS\nEXECUTE AS USER = 'ChiefOperatingManager';  \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Sp_HealthCareRLS')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/storedProcedures"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[Sp_HealthCareRLS] AS \nBegin\t\n\t-- After creating the users, read access is provided to all three users on FactSales table\n\tGRANT SELECT ON [HealthCare-FactSales] TO ChiefOperatingManager, CareManagerMiami, CareManagerLosAngeles;  \n\n\tIF EXISts (SELECT 1 FROM sys.security_predicates sp where sp.predicate_definition='([Security].[fn_securitypredicate]([SalesRep]))')\n\tBEGIN\n\t\tDROP SECURITY POLICY SalesFilter;\n\t\tDROP FUNCTION Security.fn_securitypredicate;\n\tEND\n\t\n\tIF  EXISTS (SELECT * FROM sys.schemas where name='Security')\n\tBEGIN\t\n\tDROP SCHEMA Security;\n\tEnd\n\t\n\t/* Moving ahead, we Create a new schema, and an inline table-valued function. \n\tThe function returns 1 when a row in the SalesRep column is the same as the user executing the query (@SalesRep = USER_NAME())\n\tor if the user executing the query is the Manager user (USER_NAME() = 'ChiefOperatingManager').\n\t*/\nend\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createSchema_hpi')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "CREATE SCHEMA hpi;\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createTable_Campaign_Analytics')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[Campaign_Analytics]\n(\n\t[Region] [varchar](50) NULL,\n\t[Country] [varchar](50) NULL,\n\t[Campaign_Name] [varchar](50) NULL,\n\t[Revenue] [varchar](50) NULL,\n\t[Revenue_Target] [varchar](50) NULL,\n\t[City] [varchar](50) NULL,\n\t[State] [varchar](50) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createTable_Campaign_Analytics_New')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[Campaign_Analytics_New]\n(\n\t[Region] [nvarchar](4000) NULL,\n\t[Country] [nvarchar](4000) NULL,\n\t[Campaign_Name] [nvarchar](4000) NULL,\n\t[Revenue] [nvarchar](4000) NULL,\n\t[Revenue_Target] [nvarchar](4000) NULL,\n\t[City] [nvarchar](4000) NULL,\n\t[State] [nvarchar](4000) NULL,\n\t[RoleID] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createTable_HealthCare-FactSales')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[HealthCare-FactSales]\n(\n\t[CareManager] [nvarchar](4000) NULL,\n\t[PayerName] [nvarchar](4000) NULL,\n\t[CampaignName] [nvarchar](4000) NULL,\n\t[Region] [nvarchar](4000) NULL,\n\t[State] [nvarchar](4000) NULL,\n\t[City] [nvarchar](4000) NULL,\n\t[Revenue] [nvarchar](4000) NULL,\n\t[RevenueTarget] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createTable_HospitalEmpPIIData')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[HospitalEmpPIIData]\n(\n\t[Id] [int] NULL,\n\t[EmpName] [nvarchar](61) NULL,\n\t[Address] [nvarchar](30) NULL,\n\t[City] [nvarchar](30) NULL,\n\t[County] [nvarchar](30) NULL,\n\t[State] [nvarchar](10) NULL,\n\t[Phone] [varchar](100) NULL,\n\t[Email] [varchar](100) NULL,\n\t[Designation] [varchar](20) NULL,\n\t[SSN] [varchar](100) NULL,\n\t[SSN_encrypted] [nvarchar](100) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createTable_Mkt_CampaignAnalyticLatest')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[Mkt_CampaignAnalyticLatest]\n(\n\t[Region] [nvarchar](4000) NULL,\n\t[Country] [nvarchar](4000) NULL,\n\t[ProductCategory] [nvarchar](4000) NULL,\n\t[Campaign_ID] [nvarchar](4000) NULL,\n\t[Campaign_Name] [nvarchar](4000) NULL,\n\t[Qualification] [nvarchar](4000) NULL,\n\t[Qualification_Number] [nvarchar](4000) NULL,\n\t[Response_Status] [nvarchar](4000) NULL,\n\t[Responses] [nvarchar](4000) NULL,\n\t[Cost] [nvarchar](4000) NULL,\n\t[Revenue] [nvarchar](4000) NULL,\n\t[ROI] [nvarchar](4000) NULL,\n\t[Lead_Generation] [nvarchar](4000) NULL,\n\t[Revenue_Target] [nvarchar](4000) NULL,\n\t[Campaign_Tactic] [nvarchar](4000) NULL,\n\t[Customer_Segment] [nvarchar](4000) NULL,\n\t[Status] [nvarchar](4000) NULL,\n\t[Profit] [nvarchar](4000) NULL,\n\t[Marketing_Cost] [nvarchar](4000) NULL,\n\t[CampaignID] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createTable_PatientInformation')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[PatientInformation]\n(\n\t[Patient Name] [nvarchar](4000) NULL,\n\t[Gender] [nvarchar](4000) NULL,\n\t[Phone] [nvarchar](4000) NULL,\n\t[Email] [nvarchar](4000) NULL,\n\t[Medical Insurance Card] [nvarchar](19) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createTable_RoleNew')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[RoleNew]\n(\n\t[RoleID] [nvarchar](4000) NULL,\n\t[Name] [nvarchar](4000) NULL,\n\t[Email] [nvarchar](4000) NULL,\n\t[Roles] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createUsers')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/security"
+				},
+				"content": {
+					"query": "-- USE master\nCREATE LOGIN [BillingStaff] WITH PASSWORD = 'Sqluserpswag83'\nCREATE LOGIN [ChiefOperatingManager] WITH PASSWORD = 'Sqluserpswag83'\nCREATE LOGIN [CareManagerMiami] WITH PASSWORD = 'Sqluserpswag83'\nCREATE LOGIN [CareManagerLosAngeles] WITH PASSWORD = 'Sqluserpswag83'\nCREATE LOGIN [CareManager] WITH PASSWORD = 'Sqluserpswag83'\nGO\n\n-- USE syndpag83datadev\nCREATE USER [BillingStaff] FOR LOGIN [BillingStaff] WITH DEFAULT_SCHEMA=[dbo];\nCREATE USER [ChiefOperatingManager] FOR LOGIN [ChiefOperatingManager] WITH DEFAULT_SCHEMA=[dbo];\nCREATE USER [CareManagerMiami] FOR LOGIN [CareManagerMiami] WITH DEFAULT_SCHEMA=[dbo];\nCREATE USER [CareManagerLosAngeles] FOR LOGIN [CareManagerLosAngeles] WITH DEFAULT_SCHEMA=[dbo];   \nCREATE USER [CareManager] FOR LOGIN [CareManager] WITH DEFAULT_SCHEMA=[dbo];\nGO   \n\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/loadTable_Campaign_Analytics')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/loadTables"
+				},
+				"content": {
+					"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_Campaign_Analytics\n--AS\n--BEGIN\nCOPY INTO dbo.Campaign_Analytics\n(Region 1, Country 2, Campaign_Name 3, Revenue 4, Revenue_Target 5, City 6, State 7)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/Campaign_Analytics'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dbo.Campaign_Analytics\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/loadTable_Campaign_Analytics_New')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/loadTables"
+				},
+				"content": {
+					"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_Campaign_Analytics_New\n--AS\n--BEGIN\nCOPY INTO dbo.Campaign_Analytics_New\n(Region 1, Country 2, Campaign_Name 3, Revenue 4, Revenue_Target 5, City 6, State 7, RoleID 8)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/Campaign_Analytics_New'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dbo.Campaign_Analytics_New\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/loadTable_Healthcare-FactSales')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/loadTables"
+				},
+				"content": {
+					"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_HealthCare-FactSales\n--AS\n--BEGIN\nCOPY INTO [dbo].[HealthCare-FactSales]\n(CareManager 1, PayerName 2, CampaignName 3, Region 4, State 5, City 6, Revenue 7, RevenueTarget 8)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/HealthCare-FactSales'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM [dbo].[HealthCare-FactSales]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/loadTable_HospitalEmpPIIData')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/loadTables"
+				},
+				"content": {
+					"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_HospitalEmpPIIData\n--AS\n--BEGIN\nCOPY INTO dbo.HospitalEmpPIIData\n(Id 1, EmpName 2, Address 3, City 4, County 5, State 6, Phone 7, Email 8, Designation 9, SSN 10, SSN_encrypted 11)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/HostpitalEmpPIIData'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dbo.HospitalEmpPIIData\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/loadTable_Mkt_CampaignAnalyticLatest')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/loadTables"
+				},
+				"content": {
+					"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_Mkt_CampaignAnalyticLatest\n--AS\n--BEGIN\nCOPY INTO dbo.Mkt_CampaignAnalyticLatest\n(Region 1, Country 2, ProductCategory 3, Campaign_ID 4, Campaign_Name 5, Qualification 6, Qualification_Number 7, Response_Status 8, Responses 9, Cost 10, Revenue 11, ROI 12, Lead_Generation 13, Revenue_Target 14, Campaign_Tactic 15, Customer_Segment 16, Status 17, Profit 18, Marketing_Cost 19, CampaignID 20)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/Mkt_CampaignAnalyticLatest'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dbo.Mkt_CampaignAnalyticLatest\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/loadTable_PatientInformation')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/loadTables"
+				},
+				"content": {
+					"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_PatientInformation\n--AS\n--BEGIN\nCOPY INTO dbo.PatientInformation\n(\"Patient Name\" 1, Gender 2, Phone 3, Email 4, \"Medical Insurance Card\" 5)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/PatientInformation'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dbo.PatientInformation\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/loadTable_RoleNew')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/loadTables"
+				},
+				"content": {
+					"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_RoleNew\n--AS\n--BEGIN\nCOPY INTO dbo.RoleNew\n(RoleID 1, Name 2, Email 3, Roles 4)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/RoleNew'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dbo.RoleNew\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "syndpag83datadev",
+						"poolName": "syndpag83datadev"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/syndpdev00006')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "westeurope"
+		}
+	]
+}
