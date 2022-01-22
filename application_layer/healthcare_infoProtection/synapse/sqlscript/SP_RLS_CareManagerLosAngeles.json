@@ -1,0 +1,20 @@
+{
+	"name": "SP_RLS_CareManagerLosAngeles",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection/storedProcedures"
+		},
+		"content": {
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_CareManagerLosAngeles] AS\nEXECUTE AS USER = 'CareManagerLosAngeles'; \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "syndpag83datadev",
+				"poolName": "syndpag83datadev"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

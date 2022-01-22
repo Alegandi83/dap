@@ -1,0 +1,20 @@
+{
+	"name": "CLS_DAM_AC_New",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection/storedProcedures"
+		},
+		"content": {
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_DAM_AC_New] AS \nGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State]) TO CareManagerMiami;\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State] from Campaign_Analytics\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "syndpag83datadev",
+				"poolName": "syndpag83datadev"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

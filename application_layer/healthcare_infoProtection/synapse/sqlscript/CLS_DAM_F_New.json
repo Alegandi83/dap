@@ -1,0 +1,20 @@
+{
+	"name": "CLS_DAM_F_New",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection/storedProcedures"
+		},
+		"content": {
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_DAM_F_New] AS \nBEGIN TRY\n-- Generate a divide-by-zero error  \n\t\n\t\tGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[CITY],[State]) TO CareManagerMiami;\n\t\tEXECUTE AS USER ='CareManagerMiami'\n\t\tselect * from Campaign_Analytics\nEND TRY\nBEGIN CATCH\n\tSELECT\n\t\tERROR_NUMBER() AS ErrorNumber,\n\t\tERROR_STATE() AS ErrorState,\n\t\tERROR_SEVERITY() AS ErrorSeverity,\n\t\tERROR_PROCEDURE() AS ErrorProcedure,\n\t\t\n\t\tERROR_MESSAGE() AS ErrorMessage;\nEND CATCH;\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "syndpag83datadev",
+				"poolName": "syndpag83datadev"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

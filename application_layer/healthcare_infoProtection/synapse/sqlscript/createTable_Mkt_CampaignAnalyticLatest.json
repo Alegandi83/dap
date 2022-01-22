@@ -1,0 +1,20 @@
+{
+	"name": "createTable_Mkt_CampaignAnalyticLatest",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection/createTables"
+		},
+		"content": {
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[Mkt_CampaignAnalyticLatest]\n(\n\t[Region] [nvarchar](4000) NULL,\n\t[Country] [nvarchar](4000) NULL,\n\t[ProductCategory] [nvarchar](4000) NULL,\n\t[Campaign_ID] [nvarchar](4000) NULL,\n\t[Campaign_Name] [nvarchar](4000) NULL,\n\t[Qualification] [nvarchar](4000) NULL,\n\t[Qualification_Number] [nvarchar](4000) NULL,\n\t[Response_Status] [nvarchar](4000) NULL,\n\t[Responses] [nvarchar](4000) NULL,\n\t[Cost] [nvarchar](4000) NULL,\n\t[Revenue] [nvarchar](4000) NULL,\n\t[ROI] [nvarchar](4000) NULL,\n\t[Lead_Generation] [nvarchar](4000) NULL,\n\t[Revenue_Target] [nvarchar](4000) NULL,\n\t[Campaign_Tactic] [nvarchar](4000) NULL,\n\t[Customer_Segment] [nvarchar](4000) NULL,\n\t[Status] [nvarchar](4000) NULL,\n\t[Profit] [nvarchar](4000) NULL,\n\t[Marketing_Cost] [nvarchar](4000) NULL,\n\t[CampaignID] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "syndpag83datadev",
+				"poolName": "syndpag83datadev"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

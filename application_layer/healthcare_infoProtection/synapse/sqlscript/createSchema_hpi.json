@@ -1,0 +1,20 @@
+{
+	"name": "createSchema_hpi",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection/createTables"
+		},
+		"content": {
+			"query": "CREATE SCHEMA hpi;\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "syndpag83datadev",
+				"poolName": "syndpag83datadev"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

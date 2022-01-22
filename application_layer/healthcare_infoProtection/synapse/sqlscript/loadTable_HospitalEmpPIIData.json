@@ -1,0 +1,20 @@
+{
+	"name": "loadTable_HospitalEmpPIIData",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection/loadTables"
+		},
+		"content": {
+			"query": "--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_HospitalEmpPIIData\n--AS\n--BEGIN\nCOPY INTO dbo.HospitalEmpPIIData\n(Id 1, EmpName 2, Address 3, City 4, County 5, State 6, Phone 7, Email 8, Designation 9, SSN 10, SSN_encrypted 11)\nFROM 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/HostpitalEmpPIIData'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIELDTERMINATOR = ';'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://dlscsag83datadev.dfs.core.windows.net/healthcare-info-protection/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dbo.HospitalEmpPIIData\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "syndpag83datadev",
+				"poolName": "syndpag83datadev"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

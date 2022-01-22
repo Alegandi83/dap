@@ -1,0 +1,20 @@
+{
+	"name": "createTable_RoleNew",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection/createTables"
+		},
+		"content": {
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[RoleNew]\n(\n\t[RoleID] [nvarchar](4000) NULL,\n\t[Name] [nvarchar](4000) NULL,\n\t[Email] [nvarchar](4000) NULL,\n\t[Roles] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "syndpag83datadev",
+				"poolName": "syndpag83datadev"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
