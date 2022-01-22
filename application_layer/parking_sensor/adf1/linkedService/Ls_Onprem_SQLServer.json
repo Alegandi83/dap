@@ -1,0 +1,16 @@
+{
+	"name": "Ls_Onprem_SQLServer",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=DESKTOP-1R27PFA;initial catalog=AG83DB;user id=sa",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJmNjFiMDVhNy04YjQ3LTRkMjAtYjcyMi04N2JlZTdmNDIyMWQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "Lsshir01",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
