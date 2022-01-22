@@ -181,7 +181,7 @@ resource script 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
     azPowerShellVersion: '3.0'
     arguments: '-project ${project} -env ${env} -deployment_id ${deployment_id} -tenant_id ${tenant_id} -subscriptionId ${subscription_id} -resourceGroupName ${rg_name} -location ${location} -user_id ${keyvault_owner_object_id} -purview_account ${purview.outputs.purview_name} -vault_uri ${keyvault.outputs.keyvault_resource_uri} -admin_login ${sql.outputs.sql_admin_name} -sql_secret_name ${sql_administrator_Password} -sql_server_name ${sql.outputs.sql_server_name} -sql_db_name ${sql.outputs.sql_database_name} -storage_account_name ${storage.outputs.storage_account_name} -adf_name ${datafactory.outputs.datafactory_name} -adf_principal_id ${datafactory.outputs.datafactory_principal_id} -syn_name ${synapse.outputs.synapseWorkspaceName} -syn_principal_id ${synapse.outputs.synapse_principal_id} -managed_identity ${userAssignedIdentity.properties.principalId}'
     // scriptContent: loadTextContent('deploymentScript.ps1')
-    primaryScriptUri: 'https://raw.githubusercontent.com/Alegandi83/modern-data-warehouse-dataops/main/e2e_samples/parking_sensors_synapse/platform_layer/azure/purview/deploy_purview_artifacts.ps1'
+    primaryScriptUri: 'https://raw.githubusercontent.com/Alegandi83/modern-data-warehouse-dataops/main/platform_layer/azure/purview/deploy_purview_artifacts.ps1'
     forceUpdateTag: guid(resourceGroup().id)
     retentionInterval: 'PT4H' // deploymentScript resource will delete itself in 4 hours
   }

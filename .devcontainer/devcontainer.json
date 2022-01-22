@@ -1,8 +1,8 @@
 {
-	"name": "csa_dai evinronment",
+	"name": "dap evinronment",
 	"dockerComposeFile": "docker-compose.yml",
-	"workspaceFolder": "/workspace/e2e_samples/parking_sensors_synapse",
-	"service": "csa_dai_dc",
+	"workspaceFolder": "/workspace",
+	"service": "dap_dc",
 	
 	// added to run docker-in-docker
 	//"runArgs": ["--init", "--privileged"],

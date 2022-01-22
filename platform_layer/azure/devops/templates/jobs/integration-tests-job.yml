@@ -5,7 +5,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   variables:
-    pythonWorkingDir: 'e2e_samples/parking_sensors_synapse/tests/integrationtests'
+    pythonWorkingDir: 'platform_layer/tests/integrationtests'
     pythonVersion: 3.6
   steps:
   - script: |

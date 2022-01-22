@@ -5,7 +5,7 @@ TRUNCATE TABLE hpi.[Healthcare-FactSales]
 GO
 
 BULK INSERT hpi.[Healthcare-FactSales]
-FROM 'C:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\application_layer\healthcare_infoProtection\data\Healthcare-FactSales.csv'
+FROM 'C:\code\dap\application_layer\healthcare_infoProtection\data\Healthcare-FactSales.csv'
 WITH
 (
     FIRSTROW = 2,

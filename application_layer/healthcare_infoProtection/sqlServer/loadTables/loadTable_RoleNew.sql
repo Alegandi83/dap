@@ -5,7 +5,7 @@ TRUNCATE TABLE hpi.RoleNew
 GO
 
 BULK INSERT hpi.RoleNew
-FROM 'C:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\application_layer\healthcare_infoProtection\data\RoleNew.csv'
+FROM 'C:\code\dap\application_layer\healthcare_infoProtection\data\RoleNew.csv'
 WITH
 (
     FIRSTROW = 2,

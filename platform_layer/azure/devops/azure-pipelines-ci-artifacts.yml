@@ -5,12 +5,12 @@ trigger:
     - release/*
   paths:
     include:
-    - e2e_samples/parking_sensors_synapse/*
+    - platform_layer/*
 
 pr: none
 
 variables:
-  basePath: 'e2e_samples/parking_sensors_synapse'
+  basePath: 'platform_layer'
   pythonWorkingDir: '$(basePath)/src/ddo_transform'
   synapseConfigDir: '$(basePath)/synapse/config'
   pythonPackageMajorVersion:  1
