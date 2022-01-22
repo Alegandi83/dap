@@ -2,7 +2,7 @@
 	"name": "SqlServer_onPremise_ControlTable",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Ls_Onprem_SqlServer",
+			"referenceName": "Ls_Onprem_SQLServer",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
@@ -17,7 +17,7 @@
 		"type": "SqlServerTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": "dbo",
+			"schema": "hpi",
 			"table": {
 				"value": "@dataset().TableName",
 				"type": "Expression"
