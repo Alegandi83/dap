@@ -1,0 +1,105 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ag83-adf-dev-00006"
+		},
+		"Ls_AzureSQLDW_01_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ls_AzureSQLDW_01'"
+		},
+		"Ls_Onprem_SQLServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ls_Onprem_SQLServer'"
+		},
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "@dataset().infilename"
+		},
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "@concat(dataset().container, '/', dataset().infilefolder)"
+		},
+		"Ls_AdlsGen2_01_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ag83stdev00006.dfs.core.windows.net"
+		},
+		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://ag83-kv-dev-00006.vault.azure.net/"
+		},
+		"Ls_Rest_MelParkSensors_01_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.melbourne.vic.gov.au/resource/"
+		},
+		"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "sqlConnectionString"
+		},
+		"Lsshir01_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourcegroups/rg-ag83data-dev-001/providers/Microsoft.DataFactory/factories/adf-ag83data-dev/integrationruntimes/ag83-integrationRuntime1"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "ag83-adf-dev-00006_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Ls_AzureSQLDW_01_connectionString": {
+						"value": "[parameters('Ls_AzureSQLDW_01_connectionString')]"
+					},
+					"Ls_Onprem_SQLServer_connectionString": {
+						"value": "[parameters('Ls_Onprem_SQLServer_connectionString')]"
+					},
+					"Ls_AdlsGen2_01_properties_typeProperties_url": {
+						"value": "[parameters('Ls_AdlsGen2_01_properties_typeProperties_url')]"
+					},
+					"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
+						"value": "[parameters('Ls_KeyVault_01_properties_typeProperties_baseUrl')]"
+					},
+					"Ls_Rest_MelParkSensors_01_properties_typeProperties_url": {
+						"value": "[parameters('Ls_Rest_MelParkSensors_01_properties_typeProperties_url')]"
+					},
+					"Lsshir01_properties_typeProperties_linkedInfo_resourceId": {
+						"value": "[parameters('Lsshir01_properties_typeProperties_linkedInfo_resourceId')]"
+					},
+					"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
+						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName')]"
+					},
+					"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
+						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath')]"
+					},
+					"Ls_SqlDb_01_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('Ls_SqlDb_01_properties_typeProperties_connectionString_secretName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
