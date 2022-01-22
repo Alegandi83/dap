@@ -85,7 +85,7 @@ createTrigger () {
 echo "Deploying Data Factory artifacts."
 
 # Deploy all Integration Runtimes
-createIntegrationRuntime "Shir-IntegrationRuntime-01"
+createIntegrationRuntime "Lsshir01"
 getIntegrationRuntimeConnectionInfo "Lsshir01"
 
 # Deploy all Linked Services
