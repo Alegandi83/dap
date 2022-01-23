@@ -12,16 +12,6 @@
 			"value": ""
 		},
 		"Ls_AdlsGen2_01_properties_typeProperties_url": {
-			"value": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "Ls_KeyVault_01",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "datalakeurl"
-			}
-		},
-		"Ls_AdlsGen2_02_properties_typeProperties_url": {
 			"value": "https://ag83stdev00006.dfs.core.windows.net"
 		},
 		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
