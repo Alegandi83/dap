@@ -5,7 +5,7 @@
 			"name": "healthcare_information_protection/storedProcedures"
 		},
 		"content": {
-			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_ChiefOperatingManager] AS\nEXECUTE AS USER = 'ChiefOperatingManager';  \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[SP_RLS_ChiefOperatingManager] AS\nEXECUTE AS USER = 'ChiefOperatingManager';  \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
 			"metadata": {
 				"language": "sql"
 			},

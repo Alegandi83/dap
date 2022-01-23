@@ -5,13 +5,13 @@
 			"name": "healthcare_information_protection/storedProcedures"
 		},
 		"content": {
-			"query": "SET ANSI_NULLS ON\nGO\n\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE PROC [dbo].[Confirm_DDM] AS \nSELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \nFROM sys.masked_columns AS c  \nJOIN sys.tables AS tbl   ON c.[object_id] = tbl.[object_id]  WHERE is_masked = 1;",
+			"query": "SET ANSI_NULLS ON\nGO\n\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE PROC [hpi].[Confirm_DDM] AS \nSELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \nFROM sys.masked_columns AS c  \nJOIN sys.tables AS tbl   ON c.[object_id] = tbl.[object_id]  WHERE is_masked = 1;",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "syndpag83datadev",
-				"poolName": "syndpag83datadev"
+				"databaseName": "syndpdev00006",
+				"poolName": "syndpdev00006"
 			},
 			"resultLimit": 5000
 		},
