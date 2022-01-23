@@ -342,7 +342,7 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_ChiefOperatingManager] AS \nRevert;\nGRANT SELECT ON Campaign_Analytics TO ChiefOperatingManager;  --Full access to all columns.\n-- Step:6 Let us check if our ChiefOperatingManager user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\nEXECUTE AS USER ='ChiefOperatingManager'\nselect * from Campaign_Analytics\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_ChiefOperatingManager] AS \nRevert;\nGRANT SELECT ON hpi.Campaign_Analytics TO ChiefOperatingManager;  --Full access to all columns.\n-- Step:6 Let us check if our ChiefOperatingManager user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\nEXECUTE AS USER ='ChiefOperatingManager'\nselect * from hpi.Campaign_Analytics\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -365,7 +365,7 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_DAM_AC_New] AS \nGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State]) TO CareManagerMiami;\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State] from Campaign_Analytics\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_DAM_AC_New] AS \nGRANT SELECT ON hpi.Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State]) TO CareManagerMiami;\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State] from hpi.Campaign_Analytics\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -388,7 +388,7 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_DAM_F_New] AS \nBEGIN TRY\n-- Generate a divide-by-zero error  \n\t\n\t\tGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[CITY],[State]) TO CareManagerMiami;\n\t\tEXECUTE AS USER ='CareManagerMiami'\n\t\tselect * from Campaign_Analytics\nEND TRY\nBEGIN CATCH\n\tSELECT\n\t\tERROR_NUMBER() AS ErrorNumber,\n\t\tERROR_STATE() AS ErrorState,\n\t\tERROR_SEVERITY() AS ErrorSeverity,\n\t\tERROR_PROCEDURE() AS ErrorProcedure,\n\t\t\n\t\tERROR_MESSAGE() AS ErrorMessage;\nEND CATCH;\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_DAM_F_New] AS \nBEGIN TRY\n-- Generate a divide-by-zero error  \n\t\n\t\tGRANT SELECT ON hpi.Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[CITY],[State]) TO CareManagerMiami;\n\t\tEXECUTE AS USER ='CareManagerMiami'\n\t\tselect [Region],[Country],[Campaign_Name],[Revenue_Target],[CITY],[State] from hpi.Campaign_Analytics\nEND TRY\nBEGIN CATCH\n\tSELECT\n\t\tERROR_NUMBER() AS ErrorNumber,\n\t\tERROR_STATE() AS ErrorState,\n\t\tERROR_SEVERITY() AS ErrorSeverity,\n\t\tERROR_PROCEDURE() AS ErrorProcedure,\n\t\t\n\t\tERROR_MESSAGE() AS ErrorMessage;\nEND CATCH;\nGO",
 					"metadata": {
 						"language": "sql"
 					},
