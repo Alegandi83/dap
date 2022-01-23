@@ -146,12 +146,12 @@ uploadSynapseArtifactsToSparkPool(){
 createIntegrationRuntime () {
     declare name=$1
     echo "Creating Synapse IntegrationRuntime: $name"
-    az synapse integration-runtime create --file @./.tmp/synapse/workspace/integrationRuntime/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse integration-runtime create --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --resource-group "${RESOURCE_GROUP_NAME}" --type SelfHosted
 }
 getIntegrationRuntimeConnectionInfo () {
     declare name=$1
     echo "Get Synapse IntegrationRuntime Connection Info: $name"
-    az synapse integration-runtime get-connection-info --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --name ${name}
+    az synapse integration-runtime get-connection-info --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --name ${name} --resource-group "${RESOURCE_GROUP_NAME}"
 }
 createLinkedService () {
     declare name=$1
@@ -248,56 +248,11 @@ do
     echo "$provision_state: checking again in 10 seconds..."
 done
 
-# Build requirement.txt string to upload in the Spark Configuration
-configurationList=""
-while read -r p; do 
-    line=$(echo "$p" | tr -d '\r' | tr -d '\n')
-    if [ "$configurationList" != "" ]; then configurationList="$configurationList$line\r\n" ; else configurationList="$line\r\n"; fi
-done < $requirementsFileName
-
-# Build packages list to upload in the Spark Pool, upload packages to synapse workspace
-libraryList=""
-for file in "$packagesDirectory"*.whl; do
-    filename=${file##*/}
-    librariesToUpload="{
-        \"name\": \"${filename}\",
-        \"path\": \"${SYNAPSE_WORKSPACE_NAME}/libraries/${filename}\",
-        \"containerName\": \"prep\",
-        \"type\": \"whl\"
-    }"
-    if [ "$libraryList" != "" ]; then libraryList=${libraryList}","${librariesToUpload}; else libraryList=${librariesToUpload};fi
-    uploadSynapsePackagesToWorkspace "${filename}"
-done
-customlibraryList="customLibraries:[$libraryList],"
-uploadSynapseArtifactsToSparkPool "${configurationList}" "${customlibraryList}"
-
-getProvisioningState
-echo "$provision_state"
-while [ "$provision_state" != "Succeeded" ]
-do
-    if [ "$provision_state" == "Failed" ]; then break ; else sleep 30; fi
-    getProvisioningState
-    echo "$provision_state: checking again in 30 seconds..."
-done
-
-# Deploy all Linked Services
-# Auxiliary string to parametrize the keyvault name on the ls json file
-keyVaultLsContent="{
-    \"name\": \"Ls_KeyVault_01\",
-    \"properties\": {
-        \"annotations\": [],
-        \"type\": \"AzureKeyVault\",
-        \"typeProperties\": {
-            \"baseUrl\": \"https://${KEYVAULT_NAME}.vault.azure.net/\"
-        }
-    }
-}"
-echo "$keyVaultLsContent" > ./synapse/workspace/linkedService/Ls_KeyVault_01.json
 
  
 # Deploy all Integration Runtimes
-createIntegrationRuntime "Shir-IntegrationRuntime-01"
-getIntegrationRuntimeConnectionInfo "Lsshir01"
+createIntegrationRuntime "Lsshir01"
+#getIntegrationRuntimeConnectionInfo "Lsshir01"
 
 # Deploy all Linked Services
 createLinkedService "Ls_KeyVault_01"

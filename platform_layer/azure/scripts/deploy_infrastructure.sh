@@ -110,6 +110,7 @@ azure_storage_key=$(az storage account keys list \
     --output json |
     jq -r '.[0].value')
 
+
 # Add file system storage account
 storage_file_system=datalake
 echo "Creating ADLS Gen2 File system: $storage_file_system"
@@ -282,6 +283,7 @@ mkdir -p $synTempDir && cp -a synapse/ .tmp/
 tmpfile=.tmpfile
 synLsDir=$synTempDir/workspace/linkedService
 jq --arg kvurl "$kv_dns_name" '.properties.typeProperties.baseUrl = $kvurl' $adfLsDir/Ls_KeyVault_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_KeyVault_01.json
+jq --arg datalakeUrl "https://$azure_storage_account.dfs.core.windows.net" '.properties.typeProperties.url = $datalakeUrl' $synLsDir/Ls_AdlsGen2_02.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AdlsGen2_02.json
 jq --arg databricksWorkspaceUrl "$databricks_host" '.properties.typeProperties.domain = $databricksWorkspaceUrl' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
 jq --arg databricks_workspace_resource_id "$databricks_workspace_resource_id" '.properties.typeProperties.workspaceResourceId = $databricks_workspace_resource_id' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
 

@@ -1,9 +1,0 @@
-{
-	"name": "adf-ag83data-dev",
-	"location": "westeurope",
-	"identity": {
-		"type": "SystemAssigned",
-		"principalId": "3c64af61-66e6-4dfe-8c15-40cfd786e55c",
-		"tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47"
-	}
-}

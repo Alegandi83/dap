@@ -2,21 +2,14 @@
 	"name": "Ls_AdlsGen2_01",
 	"type": "Microsoft.Synapse/workspaces/linkedservices",
 	"properties": {
+		"annotations": [],
 		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://ag83stdev00005.dfs.core.windows.net"
+		},
 		"connectVia": {
 			"referenceName": "AutoResolveIntegrationRuntime",
 			"type": "IntegrationRuntimeReference"
-		},
-		"annotations": [],
-		"typeProperties": {
-			"url": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "Ls_KeyVault_01",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "datalakeurl"
-			}
 		}
 	}
 }

@@ -117,11 +117,5 @@ createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"
 createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb"                                                       
  
 
-# Deploy Use Case - Parking Sensor
-createLinkedService "Ls_Rest_MelParkSensors_01"
-createDataset "Ds_AdlsGen2_MelbParkingData"
-createDataset "Ds_REST_MelbParkingData"
-createPipeline "P_Ingest_MelbParkingData"
-createTrigger "T_Sched"
 
 echo "Completed deploying Data Factory artifacts."

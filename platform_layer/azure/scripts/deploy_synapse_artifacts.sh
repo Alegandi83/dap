@@ -249,20 +249,6 @@ do
 done
 
 
-# Deploy all Linked Services
-# Auxiliary string to parametrize the keyvault name on the ls json file
-keyVaultLsContent="{
-    \"name\": \"Ls_KeyVault_01\",
-    \"properties\": {
-        \"annotations\": [],
-        \"type\": \"AzureKeyVault\",
-        \"typeProperties\": {
-            \"baseUrl\": \"https://${KEYVAULT_NAME}.vault.azure.net/\"
-        }
-    }
-}"
-echo "$keyVaultLsContent" > ./synapse/workspace/linkedService/Ls_KeyVault_01.json
-
  
 # Deploy all Integration Runtimes
 createIntegrationRuntime "Lsshir01"
@@ -295,28 +281,4 @@ createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"
 createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
 createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb" 
 
-
-# Start Deploy Use Case - Parking Sensor ------------------------------------------
-createLinkedService "Ls_Rest_MelParkSensors_01"
-createDataset "Ds_AdlsGen2_MelbParkingData"
-createDataset "Ds_REST_MelbParkingData"
-createPipeline "P_Ingest_MelbParkingData"
-createTrigger "T_Sched"
-
-# This line allows the spark pool to be available to attach to the notebooks
-az synapse spark session list --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
-createNotebook "00_setup"
-createNotebook "01a_explore"
-createNotebook "01b_explore_sqlserverless"
-createNotebook "02_standardize"
-createNotebook "03_transform"
-
-# Upload SQL script
-UpdateExternalTableScript
-# Upload create_db_user_template for now. 
-# TODO: will replace and run this sql in deploying
-# TODO: will replace and run this sql in deploying
-UploadSql "create_db_user_template"
-UploadSql "create_external_table"
 echo "Completed deploying Synapse artifacts."
-# End Deploy Use Case - Parking Sensor ------------------------------------------
