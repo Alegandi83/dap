@@ -5,13 +5,13 @@
 			"name": "healthcare_information_protection/createTables"
 		},
 		"content": {
-			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[Campaign_Analytics]\n(\n\t[Region] [varchar](50) NULL,\n\t[Country] [varchar](50) NULL,\n\t[Campaign_Name] [varchar](50) NULL,\n\t[Revenue] [varchar](50) NULL,\n\t[Revenue_Target] [varchar](50) NULL,\n\t[City] [varchar](50) NULL,\n\t[State] [varchar](50) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [hpi].[Campaign_Analytics]\n(\n\t[Region] [varchar](50) NULL,\n\t[Country] [varchar](50) NULL,\n\t[Campaign_Name] [varchar](50) NULL,\n\t[Revenue] [varchar](50) NULL,\n\t[Revenue_Target] [varchar](50) NULL,\n\t[City] [varchar](50) NULL,\n\t[State] [varchar](50) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "syndpag83datadev",
-				"poolName": "syndpag83datadev"
+				"databaseName": "syndpdev00006",
+				"poolName": "syndpdev00006"
 			},
 			"resultLimit": 5000
 		},

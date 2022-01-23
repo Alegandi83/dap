@@ -5,13 +5,13 @@
 			"name": "healthcare_information_protection/createTables"
 		},
 		"content": {
-			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [dbo].[PatientInformation]\n(\n\t[Patient Name] [nvarchar](4000) NULL,\n\t[Gender] [nvarchar](4000) NULL,\n\t[Phone] [nvarchar](4000) NULL,\n\t[Email] [nvarchar](4000) NULL,\n\t[Medical Insurance Card] [nvarchar](19) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [hpi].[PatientInformation]\n(\n\t[Patient Name] [nvarchar](4000) NULL,\n\t[Gender] [nvarchar](4000) NULL,\n\t[Phone] [nvarchar](4000) NULL,\n\t[Email] [nvarchar](4000) NULL,\n\t[Medical Insurance Card] [nvarchar](19) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "syndpag83datadev",
-				"poolName": "syndpag83datadev"
+				"databaseName": "syndpdev00006",
+				"poolName": "syndpdev00006"
 			},
 			"resultLimit": 5000
 		},
