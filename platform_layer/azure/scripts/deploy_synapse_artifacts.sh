@@ -259,6 +259,7 @@ createLinkedService "Ls_KeyVault_01"
 createLinkedService "Ls_AdlsGen2_01"
 createLinkedService "Ls_SqlDb_01"
 createLinkedService "Ls_AzureDatabricks_01"
+createLinkedService "Ls_PowerBI_01"
 createLinkedService "Ls_Onprem_SQLServer"
 
 # Deploy all Datasets

@@ -283,10 +283,11 @@ mkdir -p $synTempDir && cp -a synapse/ .tmp/
 tmpfile=.tmpfile
 synLsDir=$synTempDir/workspace/linkedService
 jq --arg kvurl "$kv_dns_name" '.properties.typeProperties.baseUrl = $kvurl' $adfLsDir/Ls_KeyVault_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_KeyVault_01.json
-jq --arg datalakeUrl "https://$azure_storage_account.dfs.core.windows.net" '.properties.typeProperties.url = $datalakeUrl' $synLsDir/Ls_AdlsGen2_02.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AdlsGen2_02.json
+jq --arg datalakeUrl "https://$azure_storage_account.dfs.core.windows.net" '.properties.typeProperties.url = $datalakeUrl' $synLsDir/Ls_AdlsGen2_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AdlsGen2_01.json
 jq --arg databricksWorkspaceUrl "$databricks_host" '.properties.typeProperties.domain = $databricksWorkspaceUrl' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
 jq --arg databricks_workspace_resource_id "$databricks_workspace_resource_id" '.properties.typeProperties.workspaceResourceId = $databricks_workspace_resource_id' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
-
+jq --arg pbitenantid "${PBI_TENANT_ID}" '.properties.typeProperties.tenantID = $pbitenantid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
+jq --arg pbiworkspaceid "${PBI_WS_ID}" '.properties.typeProperties.workspaceID = $pbiworkspaceid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
 
 # Deploy Synapse artifacts
 AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
