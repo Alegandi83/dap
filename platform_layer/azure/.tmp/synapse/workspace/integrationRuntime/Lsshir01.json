@@ -1,7 +1,0 @@
-{
-	"name": "Lsshir01",
-	"properties": {
-		"type": "SelfHosted",
-		"description": "integration runtime to load on-premise SQL Server data"
-	}
-}
