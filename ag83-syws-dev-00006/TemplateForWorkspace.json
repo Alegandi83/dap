@@ -342,13 +342,13 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_ChiefOperatingManager] AS \nRevert;\nGRANT SELECT ON Campaign_Analytics TO ChiefOperatingManager;  --Full access to all columns.\n-- Step:6 Let us check if our ChiefOperatingManager user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\nEXECUTE AS USER ='ChiefOperatingManager'\nselect * from Campaign_Analytics\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_ChiefOperatingManager] AS \nRevert;\nGRANT SELECT ON Campaign_Analytics TO ChiefOperatingManager;  --Full access to all columns.\n-- Step:6 Let us check if our ChiefOperatingManager user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\nEXECUTE AS USER ='ChiefOperatingManager'\nselect * from Campaign_Analytics\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
@@ -365,13 +365,13 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_DAM_AC_New] AS \nGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State]) TO CareManagerMiami;\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State] from Campaign_Analytics\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_DAM_AC_New] AS \nGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State]) TO CareManagerMiami;\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State] from Campaign_Analytics\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
@@ -388,13 +388,13 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[CLS_DAM_F_New] AS \nBEGIN TRY\n-- Generate a divide-by-zero error  \n\t\n\t\tGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[CITY],[State]) TO CareManagerMiami;\n\t\tEXECUTE AS USER ='CareManagerMiami'\n\t\tselect * from Campaign_Analytics\nEND TRY\nBEGIN CATCH\n\tSELECT\n\t\tERROR_NUMBER() AS ErrorNumber,\n\t\tERROR_STATE() AS ErrorState,\n\t\tERROR_SEVERITY() AS ErrorSeverity,\n\t\tERROR_PROCEDURE() AS ErrorProcedure,\n\t\t\n\t\tERROR_MESSAGE() AS ErrorMessage;\nEND CATCH;\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_DAM_F_New] AS \nBEGIN TRY\n-- Generate a divide-by-zero error  \n\t\n\t\tGRANT SELECT ON Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[CITY],[State]) TO CareManagerMiami;\n\t\tEXECUTE AS USER ='CareManagerMiami'\n\t\tselect * from Campaign_Analytics\nEND TRY\nBEGIN CATCH\n\tSELECT\n\t\tERROR_NUMBER() AS ErrorNumber,\n\t\tERROR_STATE() AS ErrorState,\n\t\tERROR_SEVERITY() AS ErrorSeverity,\n\t\tERROR_PROCEDURE() AS ErrorProcedure,\n\t\t\n\t\tERROR_MESSAGE() AS ErrorMessage;\nEND CATCH;\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
@@ -411,13 +411,13 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\n\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE PROC [dbo].[Confirm_DDM] AS \nSELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \nFROM sys.masked_columns AS c  \nJOIN sys.tables AS tbl   ON c.[object_id] = tbl.[object_id]  WHERE is_masked = 1;",
+					"query": "SET ANSI_NULLS ON\nGO\n\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE PROC [hpi].[Confirm_DDM] AS \nSELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \nFROM sys.masked_columns AS c  \nJOIN sys.tables AS tbl   ON c.[object_id] = tbl.[object_id]  WHERE is_masked = 1;",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
@@ -434,13 +434,13 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_CareManagerLosAngeles] AS\nEXECUTE AS USER = 'CareManagerLosAngeles'; \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[SP_RLS_CareManagerLosAngeles] AS\nEXECUTE AS USER = 'CareManagerLosAngeles'; \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
@@ -457,13 +457,13 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_CareManagerMiami] AS\nEXECUTE AS USER = 'CareManagerMiami' \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[SP_RLS_CareManagerMiami] AS\nEXECUTE AS USER = 'CareManagerMiami' \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
@@ -480,7 +480,7 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[SP_RLS_ChiefOperatingManager] AS\nEXECUTE AS USER = 'ChiefOperatingManager';  \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[SP_RLS_ChiefOperatingManager] AS\nEXECUTE AS USER = 'ChiefOperatingManager';  \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -503,13 +503,13 @@
 					"name": "healthcare_information_protection/storedProcedures"
 				},
 				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [dbo].[Sp_HealthCareRLS] AS \nBegin\t\n\t-- After creating the users, read access is provided to all three users on FactSales table\n\tGRANT SELECT ON [HealthCare-FactSales] TO ChiefOperatingManager, CareManagerMiami, CareManagerLosAngeles;  \n\n\tIF EXISts (SELECT 1 FROM sys.security_predicates sp where sp.predicate_definition='([Security].[fn_securitypredicate]([SalesRep]))')\n\tBEGIN\n\t\tDROP SECURITY POLICY SalesFilter;\n\t\tDROP FUNCTION Security.fn_securitypredicate;\n\tEND\n\t\n\tIF  EXISTS (SELECT * FROM sys.schemas where name='Security')\n\tBEGIN\t\n\tDROP SCHEMA Security;\n\tEnd\n\t\n\t/* Moving ahead, we Create a new schema, and an inline table-valued function. \n\tThe function returns 1 when a row in the SalesRep column is the same as the user executing the query (@SalesRep = USER_NAME())\n\tor if the user executing the query is the Manager user (USER_NAME() = 'ChiefOperatingManager').\n\t*/\nend\nGO",
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[Sp_HealthCareRLS] AS \nBegin\t\n\t-- After creating the users, read access is provided to all three users on FactSales table\n\tGRANT SELECT ON [HealthCare-FactSales] TO ChiefOperatingManager, CareManagerMiami, CareManagerLosAngeles;  \n\n\tIF EXISts (SELECT 1 FROM sys.security_predicates sp where sp.predicate_definition='([Security].[fn_securitypredicate]([SalesRep]))')\n\tBEGIN\n\t\tDROP SECURITY POLICY SalesFilter;\n\t\tDROP FUNCTION Security.fn_securitypredicate;\n\tEND\n\t\n\tIF  EXISTS (SELECT * FROM sys.schemas where name='Security')\n\tBEGIN\t\n\tDROP SCHEMA Security;\n\tEnd\n\t\n\t/* Moving ahead, we Create a new schema, and an inline table-valued function. \n\tThe function returns 1 when a row in the SalesRep column is the same as the user executing the query (@SalesRep = USER_NAME())\n\tor if the user executing the query is the Manager user (USER_NAME() = 'ChiefOperatingManager').\n\t*/\nend\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "syndpag83datadev",
-						"poolName": "syndpag83datadev"
+						"databaseName": "syndpdev00006",
+						"poolName": "syndpdev00006"
 					},
 					"resultLimit": 5000
 				},
