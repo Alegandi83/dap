@@ -9,14 +9,7 @@
 		},
 		"annotations": [],
 		"typeProperties": {
-			"url": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "Ls_KeyVault_01",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "datalakeurl"
-			}
+			"url": "https://ag83stdev00006.dfs.core.windows.net"
 		}
 	}
 }
