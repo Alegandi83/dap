@@ -1,7 +1,7 @@
 {
 	"name": "Ls_PowerBI_01",
 	"properties": {
-		"description": "PowerBI hpi workspace on other tenant",
+		"description": "PowerBI workspace",
 		"annotations": [],
 		"type": "PowerBIWorkspace",
 		"typeProperties": {
