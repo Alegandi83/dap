@@ -126,6 +126,14 @@ az keyvault secret set --vault-name "$kv_name" --name "datalakeKey" --value "$az
 az keyvault secret set --vault-name "$kv_name" --name "datalakeurl" --value "https://$azure_storage_account.dfs.core.windows.net"
 
 #########################
+# POWER-BI
+
+pbi_ws_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-ws"
+pwsh -pbi {pbi_ws_name}
+.\powerbi\deploy_pbi_artifacts.ps1 -workspaceName ${pbi_ws_name} -userEmail ${PBI_DAP_USR_MAIL}
+bash
+
+#########################
 # SQL DATABASE
 
 # Retrive account and key

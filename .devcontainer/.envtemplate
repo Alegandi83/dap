@@ -45,5 +45,5 @@ DB_SQL_PASSWORD=Sqladminpswag83!
 # PowerBI Tenant ID
 PBI_TENANT_ID=0856a07c-daf4-44cf-acd9-12b9ba5ad6f0
 
-# PowerBI Tenant ID
-PBI_WS_ID=c8e0f963-f5f1-4f25-8f01-4cd2699cdd1f
+# PowerBI - Dap userEmail registered on PowerBI Tenant
+PBI_DAP_USR_MAIL=agandini_microsoft.com#EXT#@agandini.onmicrosoft.com
