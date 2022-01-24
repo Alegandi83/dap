@@ -1,27 +1,27 @@
-Write-Host
+param(
+    [string]$workspaceName,
+    [string]$userEmail
+)
 
-$workspaceName = "hpi_my_ws"
-$userEmail = "agandini_microsoft.com#EXT#@agandini.onmicrosoft.com"
+Write-Host "Start PowerBI Reports Setup"
+
+# Set Report Path
 $pbixFilePath = "C:\code\dap\application_layer\healthcare_infoProtection\reports\1 HealthCare Dynamic Data Masking (Azure Synapse).pbix"
-
-# Connect to PowerBI
-Connect-PowerBIServiceAccount | Out-Null
 
 # Check if Workspace exists
 $workspace = Get-PowerBIWorkspace -Name $workspaceName
 
 if($workspace) {
-  Write-Host "The workspace named $workspaceName already exists"
+  Write-Host "Import Reports into the Workspace: $workspaceName ."
+
+  # update script with file path to PBIX file
+  $import = New-PowerBIReport -Path $pbixFilePath -WorkspaceId $workspace.Id -ConflictAction CreateOrOverwrite
+  $import | select *
+
 }
 else {
-  Write-Host "Creating new workspace named $workspaceName"
-  $workspace = New-PowerBIGroup -Name $workspaceName
+  Write-Host "Workspace: $workspaceName does not exist"
+  
 }
 
-# add user as workspace member
-Add-PowerBIWorkspaceUser -Id $workspace.Id -UserEmailAddress $userEmail -AccessRight Member
-
-# update script with file path to PBIX file
-$import = New-PowerBIReport -Path $pbixFilePath -WorkspaceId $workspace.Id -ConflictAction CreateOrOverwrite
-
-$import | select *
+Write-Host "End PowerBI Reports Setup"

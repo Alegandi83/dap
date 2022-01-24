@@ -4,11 +4,7 @@ param(
 )
     
 
-Write-Host "Start PowerBI Setup"
-
-# Connect to PowerBI
-Write-Host "Start PowerBI Setup"
-Connect-PowerBIServiceAccount | Out-Null
+Write-Host "Start PowerBI Workspace Setup"
 
 # Check if Workspace exists
 $workspace = Get-PowerBIWorkspace -Name $workspaceName
@@ -25,4 +21,4 @@ else {
 Add-PowerBIWorkspaceUser -Id $workspace.Id -UserEmailAddress $userEmail -AccessRight Member
 
 
-Write-Host "End PowerBI Setup"
+Write-Host "End PowerBI Workspace Setup"

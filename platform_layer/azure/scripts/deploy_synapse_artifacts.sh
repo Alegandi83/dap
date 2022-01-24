@@ -282,4 +282,7 @@ createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"
 createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
 createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb" 
 
+# Deploy SQL Scripts
+UploadSql "create_purview_user"
+
 echo "Completed deploying Synapse artifacts."

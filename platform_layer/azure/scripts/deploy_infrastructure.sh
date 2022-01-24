@@ -133,6 +133,17 @@ pwsh -pbi {pbi_ws_name}
 .\powerbi\deploy_pbi_artifacts.ps1 -workspaceName ${pbi_ws_name} -userEmail ${PBI_DAP_USR_MAIL}
 bash
 
+
+#########################
+# PURVIEW
+
+# Retrive account and key
+purview_name=$(echo "$arm_output" | jq -r '.properties.outputs.purview_name.value')
+
+# Set Keyvault secrets
+az keyvault secret set --vault-name "$kv_name" --name "purviewName" --value "$purview_name"
+
+
 #########################
 # SQL DATABASE
 
@@ -297,6 +308,11 @@ jq --arg databricks_workspace_resource_id "$databricks_workspace_resource_id" '.
 jq --arg pbitenantid "${PBI_TENANT_ID}" '.properties.typeProperties.tenantID = $pbitenantid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
 jq --arg pbiworkspaceid "${PBI_WS_ID}" '.properties.typeProperties.workspaceID = $pbiworkspaceid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
 
+synScriptsDir=$synTempDir/workspace/scripts
+sed "s/<purview_name>/$purview_name/" \
+$synScriptsDir/create_purview_user.sql \
+> "$tmpfile" && mv "$tmpfile" $synScriptsDir/create_purview_user.json
+
 # Deploy Synapse artifacts
 AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
 RESOURCE_GROUP_NAME=$resource_group_name \
@@ -381,14 +397,7 @@ az keyvault secret set --vault-name "$kv_name" --name "spAdfPass" --value "$sp_a
 az keyvault secret set --vault-name "$kv_name" --name "spAdfTenantId" --value "$sp_adf_tenant"
 
 
-#########################
-# PURVIEW
 
-# Retrive account and key
-purview_name=$(echo "$arm_output" | jq -r '.properties.outputs.purview_name.value')
-
-# Set Keyvault secrets
-az keyvault secret set --vault-name "$kv_name" --name "purviewName" --value "$purview_name"
 
 
 

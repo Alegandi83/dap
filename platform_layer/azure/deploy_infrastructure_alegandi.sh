@@ -2,6 +2,13 @@
 #####################
 # DEPLOY ARM TEMPLATE
 
+
+# TODO install module inside devcontainer
+Install-Module -Name MicrosoftPowerBIMgmt
+
+az login                                    # Connect to Azure                                            
+Connect-PowerBIServiceAccount | Out-Null    # Connect to PowerBI
+
 export GITHUB_REPO=Alegandi83/modern-data-warehouse-dataops
 export GITHUB_PAT_TOKEN=null
 export AZURE_SUBSCRIPTION_ID=272f5f06-6693-48ae-975b-b5c7553539c2
