@@ -37,8 +37,8 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/syndpdev00006')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"name": "[concat(parameters('workspaceName'), '/synspdev00006')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"annotations": []
@@ -906,6 +906,159 @@
 					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Hpi Campaign Analytics DataPrep')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "48c06df5-9d83-4e73-8dca-6f182369c67a"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {},
+						"source": [
+							"## Notebook Sample\n",
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\n",
+							"data_path = spark.read.load('abfss://marketingdata@healthcareadlsgen2.dfs.core.windows.net/CampaignData.csv', format='csv',header=True)\n",
+							"data_path.show(10)"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {},
+						"source": [
+							"## Load into Pandas and Perform Cleansing Operations\n",
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\n",
+							"from pyspark.sql.functions import *\n",
+							"from pyspark.sql.types import *\n",
+							"\n",
+							"import numpy as np\n",
+							"\n",
+							"pd_df = data_path.select(\"*\").toPandas()\n",
+							"\n",
+							"'''Cleansing Operations: \n",
+							"1. Columns Revenue, Revenue_Target: Remove '$' symbol and convert datatype to float\n",
+							"2. Columns Revenue, Revenue_Target: Replace null values with 0\n",
+							"3. Columns Region, Country, Product_Category, Campaign_Name: Convert columns to Camel Case\n",
+							"'''\n",
+							"pd_df['Revenue']= pd_df['Revenue'].replace('[\\$,]', '', regex=True).astype(float)\n",
+							"pd_df['Revenue_Target']= pd_df['Revenue_Target'].replace('[\\$,]', '', regex=True).astype(float)\n",
+							"pd_df['Revenue'].fillna(value=0, inplace=True)\n",
+							"pd_df['Revenue_Target'].fillna(value=0, inplace=True)\n",
+							"\n",
+							"pd_df['Region'] = pd_df.Region.str.title()\n",
+							"pd_df['Country'] = pd_df.Country.str.title()\n",
+							"\n",
+							"pd_df['Campaign_Name'] = pd_df.Campaign_Name.str.title()"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {},
+						"source": [
+							"## Data Transformation - Calculate Revenue Variance\n",
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"#Create new column\n",
+							"pd_df['Revenue_Variance'] = pd_df['Revenue_Target'] - pd_df['Revenue']\n",
+							"\n",
+							"print(pd_df[1:5])"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {},
+						"source": [
+							"## Move data to Azure Data Lake Gen2\n",
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\n",
+							"df = spark.createDataFrame(pd_df)\n",
+							"df.show(5)\n",
+							"\n",
+							"(df\n",
+							" .coalesce(1)\n",
+							" .write\n",
+							" .mode(\"overwrite\")\n",
+							" .option(\"header\", \"true\")\n",
+							" .format(\"com.databricks.spark.csv\")\n",
+							" .save('abfss://marketingdata@healthcarestore1.dfs.core.windows.net/Campaignsdata'))"
+						],
+						"outputs": [],
+						"execution_count": 4
+					}
+				]
 			},
 			"dependsOn": []
 		},
