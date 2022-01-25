@@ -1,0 +1,141 @@
+{
+	"name": "Hpi Campaign Analytics DataPrep",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "34624477-5fd6-4c5a-b1a2-d244aad254de"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Notebook Sample\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\n",
+					"data_path = spark.read.load('abfss://marketingdata@healthcareadlsgen2.dfs.core.windows.net/CampaignData.csv', format='csv',header=True)\n",
+					"data_path.show(10)"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Load into Pandas and Perform Cleansing Operations\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\n",
+					"from pyspark.sql.functions import *\n",
+					"from pyspark.sql.types import *\n",
+					"\n",
+					"import numpy as np\n",
+					"\n",
+					"pd_df = data_path.select(\"*\").toPandas()\n",
+					"\n",
+					"'''Cleansing Operations: \n",
+					"1. Columns Revenue, Revenue_Target: Remove '$' symbol and convert datatype to float\n",
+					"2. Columns Revenue, Revenue_Target: Replace null values with 0\n",
+					"3. Columns Region, Country, Product_Category, Campaign_Name: Convert columns to Camel Case\n",
+					"'''\n",
+					"pd_df['Revenue']= pd_df['Revenue'].replace('[\\$,]', '', regex=True).astype(float)\n",
+					"pd_df['Revenue_Target']= pd_df['Revenue_Target'].replace('[\\$,]', '', regex=True).astype(float)\n",
+					"pd_df['Revenue'].fillna(value=0, inplace=True)\n",
+					"pd_df['Revenue_Target'].fillna(value=0, inplace=True)\n",
+					"\n",
+					"pd_df['Region'] = pd_df.Region.str.title()\n",
+					"pd_df['Country'] = pd_df.Country.str.title()\n",
+					"\n",
+					"pd_df['Campaign_Name'] = pd_df.Campaign_Name.str.title()"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Data Transformation - Calculate Revenue Variance\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#Create new column\n",
+					"pd_df['Revenue_Variance'] = pd_df['Revenue_Target'] - pd_df['Revenue']\n",
+					"\n",
+					"print(pd_df[1:5])"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Move data to Azure Data Lake Gen2\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\n",
+					"df = spark.createDataFrame(pd_df)\n",
+					"df.show(5)\n",
+					"\n",
+					"(df\n",
+					" .coalesce(1)\n",
+					" .write\n",
+					" .mode(\"overwrite\")\n",
+					" .option(\"header\", \"true\")\n",
+					" .format(\"com.databricks.spark.csv\")\n",
+					" .save('abfss://marketingdata@healthcarestore1.dfs.core.windows.net/Campaignsdata'))"
+				],
+				"execution_count": 4
+			}
+		]
+	}
+}
