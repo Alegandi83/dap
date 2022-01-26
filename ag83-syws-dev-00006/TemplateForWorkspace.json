@@ -933,7 +933,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f78ef3c9-83e8-46c1-a441-d23c0ea27e25"
+						"spark.autotune.trackingId": "d92804d3-b622-4a25-88bb-e4cf4d62f9e9"
 					}
 				},
 				"metadata": {
@@ -958,15 +958,12 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
+						"memory": 28
+					}
 				},
 				"cells": [
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Notebook Sample\n",
 							""
@@ -993,7 +990,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Load into Pandas and Perform Cleansing Operations\n",
 							""
@@ -1033,7 +1029,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Data Transformation - Calculate Revenue Variance\n",
 							""
@@ -1041,7 +1036,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Create new column\n",
 							"pd_df['Revenue_Variance'] = pd_df['Revenue_Target'] - pd_df['Revenue']\n",
@@ -1053,7 +1047,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Move data to Azure Data Lake Gen2\n",
 							""
@@ -1144,6 +1137,87 @@
 						],
 						"outputs": [],
 						"execution_count": 20
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Hpi Image Analysis')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "synspdev00006",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "b2a4813e-7d01-4797-9495-887e94ad3c46"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/ag83-00006-dev-rg/providers/Microsoft.Synapse/workspaces/ag83-syws-dev-00006/bigDataPools/synspdev00006",
+						"name": "synspdev00006",
+						"type": "Spark",
+						"endpoint": "https://ag83-syws-dev-00006.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synspdev00006",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"from IPython.display import Image\r\n",
+							"\r\n",
+							"from torch.utils.data.dataloader import DataLoader\r\n",
+							"\r\n",
+							"import azureml.core \r\n",
+							"from azureml.core import Workspace, Dataset, Experiment, Run, Model\r\n",
+							"\r\n",
+							"import mlflow\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 7
 					}
 				]
 			},
