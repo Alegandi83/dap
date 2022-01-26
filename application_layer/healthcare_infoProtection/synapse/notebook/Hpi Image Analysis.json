@@ -1,0 +1,77 @@
+{
+	"name": "Hpi Image Analysis",
+	"properties": {
+		"folder": {
+			"name": "healthcare_information_protection"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "synspdev00006",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "f7fc71ae-3c4d-48ef-8662-1a62866ff5ec"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/ag83-00006-dev-rg/providers/Microsoft.Synapse/workspaces/ag83-syws-dev-00006/bigDataPools/synspdev00006",
+				"name": "synspdev00006",
+				"type": "Spark",
+				"endpoint": "https://ag83-syws-dev-00006.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synspdev00006",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"from IPython.display import Image\r\n",
+					"\r\n",
+					"from torch.utils.data.dataloader import DataLoader\r\n",
+					"\r\n",
+					"import azureml.core \r\n",
+					"from azureml.core import Workspace, Dataset, Experiment, Run, Model\r\n",
+					"\r\n",
+					"import mlflow\r\n",
+					""
+				],
+				"execution_count": 7
+			}
+		]
+	}
+}
