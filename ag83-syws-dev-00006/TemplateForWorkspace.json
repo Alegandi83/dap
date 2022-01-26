@@ -914,8 +914,15 @@
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection"
+				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "synspdev00006",
+					"type": "BigDataPoolReference"
+				},
 				"sessionProperties": {
 					"driverMemory": "28g",
 					"driverCores": 4,
@@ -926,7 +933,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "48c06df5-9d83-4e73-8dca-6f182369c67a"
+						"spark.autotune.trackingId": "f78ef3c9-83e8-46c1-a441-d23c0ea27e25"
 					}
 				},
 				"metadata": {
@@ -934,10 +941,25 @@
 					"enableDebugMode": false,
 					"kernelspec": {
 						"name": "synapse_pyspark",
-						"display_name": "python"
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/ag83-00006-dev-rg/providers/Microsoft.Synapse/workspaces/ag83-syws-dev-00006/bigDataPools/synspdev00006",
+						"name": "synspdev00006",
+						"type": "Spark",
+						"endpoint": "https://ag83-syws-dev-00006.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synspdev00006",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -955,15 +977,19 @@
 						"metadata": {
 							"microsoft": {
 								"language": "python"
-							}
+							},
+							"collapsed": false
 						},
 						"source": [
 							"%%pyspark\n",
-							"data_path = spark.read.load('abfss://marketingdata@healthcareadlsgen2.dfs.core.windows.net/CampaignData.csv', format='csv',header=True)\n",
-							"data_path.show(10)"
+							"data_path = spark.read.load('abfss://hpi@ag83stdev00006.dfs.core.windows.net/Campaign_Analytics/hpi.Campaign_Analytics.csv'\n",
+							", format='csv'\n",
+							", header=True\n",
+							")\n",
+							"display(data_path.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 2
 					},
 					{
 						"cell_type": "markdown",
@@ -989,23 +1015,21 @@
 							"\n",
 							"pd_df = data_path.select(\"*\").toPandas()\n",
 							"\n",
-							"'''Cleansing Operations: \n",
-							"1. Columns Revenue, Revenue_Target: Remove '$' symbol and convert datatype to float\n",
-							"2. Columns Revenue, Revenue_Target: Replace null values with 0\n",
-							"3. Columns Region, Country, Product_Category, Campaign_Name: Convert columns to Camel Case\n",
-							"'''\n",
+							"# 1. Remove '$' symbol and convert datatype to float\n",
 							"pd_df['Revenue']= pd_df['Revenue'].replace('[\\$,]', '', regex=True).astype(float)\n",
 							"pd_df['Revenue_Target']= pd_df['Revenue_Target'].replace('[\\$,]', '', regex=True).astype(float)\n",
+							"\n",
+							"# 2. Replace null values with 0\n",
 							"pd_df['Revenue'].fillna(value=0, inplace=True)\n",
 							"pd_df['Revenue_Target'].fillna(value=0, inplace=True)\n",
 							"\n",
+							"# 3. Convert columns to Camel Case\n",
 							"pd_df['Region'] = pd_df.Region.str.title()\n",
 							"pd_df['Country'] = pd_df.Country.str.title()\n",
-							"\n",
 							"pd_df['Campaign_Name'] = pd_df.Campaign_Name.str.title()"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 3
 					},
 					{
 						"cell_type": "markdown",
@@ -1025,7 +1049,7 @@
 							"print(pd_df[1:5])"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 4
 					},
 					{
 						"cell_type": "markdown",
@@ -1034,6 +1058,29 @@
 							"## Move data to Azure Data Lake Gen2\n",
 							""
 						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import math\r\n",
+							"import statistics\r\n",
+							"import numpy as np\r\n",
+							"import scipy.stats\r\n",
+							"import pandas as pd"
+						],
+						"outputs": [],
+						"execution_count": 18
 					},
 					{
 						"cell_type": "code",
@@ -1048,15 +1095,55 @@
 							"df.show(5)\n",
 							"\n",
 							"(df\n",
-							" .coalesce(1)\n",
-							" .write\n",
-							" .mode(\"overwrite\")\n",
-							" .option(\"header\", \"true\")\n",
-							" .format(\"com.databricks.spark.csv\")\n",
-							" .save('abfss://marketingdata@healthcarestore1.dfs.core.windows.net/Campaignsdata'))"
+							".coalesce(1)\n",
+							".write.mode(\"overwrite\")\n",
+							".option(\"header\", \"true\")\n",
+							".format(\"com.databricks.spark.csv\")\n",
+							".save('abfss://hpi@ag83stdev00006.dfs.core.windows.net/Campaign_Analytics_Result/hpi.Campaign_Analytics.csv')\n",
+							")"
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": 19
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### Retrieve Result from Azure Data Lake Gen2"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df = spark.read.load('abfss://hpi@ag83stdev00006.dfs.core.windows.net/Campaign_Analytics_Result/hpi.Campaign_Analytics.csv/part-00000-c66281fa-6291-44b9-8832-afced8321f6b-c000.csv', format='csv'\r\n",
+							", header=True\r\n",
+							")\r\n",
+							"display(df.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 20
 					}
 				]
 			},
