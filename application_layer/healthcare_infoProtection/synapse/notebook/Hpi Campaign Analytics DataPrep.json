@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d92804d3-b622-4a25-88bb-e4cf4d62f9e9"
+				"spark.autotune.trackingId": "5e9dbc0d-d290-4556-b0e3-99e13c635aac"
 			}
 		},
 		"metadata": {
@@ -180,7 +180,7 @@
 					".save('abfss://hpi@ag83stdev00006.dfs.core.windows.net/Campaign_Analytics_Result/hpi.Campaign_Analytics.csv')\n",
 					")"
 				],
-				"execution_count": 19
+				"execution_count": 5
 			},
 			{
 				"cell_type": "markdown",
@@ -214,12 +214,12 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"df = spark.read.load('abfss://hpi@ag83stdev00006.dfs.core.windows.net/Campaign_Analytics_Result/hpi.Campaign_Analytics.csv/part-00000-c66281fa-6291-44b9-8832-afced8321f6b-c000.csv', format='csv'\r\n",
+					"df = spark.read.load('abfss://hpi@ag83stdev00006.dfs.core.windows.net/Campaign_Analytics_Result/hpi.Campaign_Analytics.csv', format='csv'\r\n",
 					", header=True\r\n",
 					")\r\n",
 					"display(df.limit(10))"
 				],
-				"execution_count": 20
+				"execution_count": 7
 			}
 		]
 	}
