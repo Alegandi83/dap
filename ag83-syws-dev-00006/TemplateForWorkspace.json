@@ -37,15 +37,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/synspdev00006')]",
-			"type": "Microsoft.Synapse/workspaces/bigDataPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/Ls_AdlsGen2_01')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -519,6 +510,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/createExternalTable_PatientInformation')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "healthcare_information_protection/createTables"
+				},
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t USE_TYPE_DEFAULT = FALSE\n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'hpi_ag83stdev00006_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [hpi_ag83stdev00006_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://hpi@ag83stdev00006.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE patientInfo (\n\t[Patient Name] nvarchar(4000),\n\t[Gender] nvarchar(4000),\n\t[Phone] nvarchar(4000),\n\t[Mail] nvarchar(4000),\n\t[Medical Insurance Card] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'PatientInformation/**',\n\tDATA_SOURCE = [hpi_ag83stdev00006_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\n\nSELECT * FROM patientInfo",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/createSchema_hpi')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -933,7 +947,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "21d5fcb7-d803-48bf-b158-c98fcbffcc02"
+						"spark.autotune.trackingId": "5e9dbc0d-d290-4556-b0e3-99e13c635aac"
 					}
 				},
 				"metadata": {
@@ -958,15 +972,12 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
+						"memory": 28
+					}
 				},
 				"cells": [
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Notebook Sample\n",
 							""
@@ -993,7 +1004,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Load into Pandas and Perform Cleansing Operations\n",
 							""
@@ -1033,7 +1043,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Data Transformation - Calculate Revenue Variance\n",
 							""
@@ -1041,7 +1050,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Create new column\n",
 							"pd_df['Revenue_Variance'] = pd_df['Revenue_Target'] - pd_df['Revenue']\n",
@@ -1053,7 +1061,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Move data to Azure Data Lake Gen2\n",
 							""
