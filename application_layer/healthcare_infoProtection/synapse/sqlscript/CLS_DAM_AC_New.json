@@ -2,7 +2,7 @@
 	"name": "CLS_DAM_AC_New",
 	"properties": {
 		"folder": {
-			"name": "hpi_sql_pool/storedProcedures"
+			"name": "hpi_sql_dedicated_pool/storedProcedures"
 		},
 		"content": {
 			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_DAM_AC_New] AS \nGRANT SELECT ON hpi.Campaign_Analytics([Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State]) TO CareManagerMiami;\nEXECUTE AS USER ='CareManagerMiami'\nselect [Region],[Country],[Campaign_Name],[Revenue_Target],[City],[State] from hpi.Campaign_Analytics\nGO",

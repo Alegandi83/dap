@@ -2,7 +2,7 @@
 	"name": "SP_RLS_CareManagerMiami",
 	"properties": {
 		"folder": {
-			"name": "hpi_sql_pool/storedProcedures"
+			"name": "hpi_sql_dedicated_pool/storedProcedures"
 		},
 		"content": {
 			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[SP_RLS_CareManagerMiami] AS\nEXECUTE AS USER = 'CareManagerMiami' \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",

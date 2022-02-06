@@ -2,7 +2,7 @@
 	"name": "CLS_ChiefOperatingManager",
 	"properties": {
 		"folder": {
-			"name": "hpi_sql_pool/storedProcedures"
+			"name": "hpi_sql_dedicated_pool/storedProcedures"
 		},
 		"content": {
 			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[CLS_ChiefOperatingManager] AS \nRevert;\nGRANT SELECT ON hpi.Campaign_Analytics TO ChiefOperatingManager;  --Full access to all columns.\n-- Step:6 Let us check if our ChiefOperatingManager user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\nEXECUTE AS USER ='ChiefOperatingManager'\nselect * from hpi.Campaign_Analytics\nGO",

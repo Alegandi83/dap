@@ -2,7 +2,7 @@
 	"name": "createTable_HealthCare-FactSales",
 	"properties": {
 		"folder": {
-			"name": "hpi_sql_pool/createTables"
+			"name": "hpi_sql_dedicated_pool/createTables"
 		},
 		"content": {
 			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [hpi].[HealthCare-FactSales]\n(\n\t[CareManager] [nvarchar](4000) NULL,\n\t[PayerName] [nvarchar](4000) NULL,\n\t[CampaignName] [nvarchar](4000) NULL,\n\t[Region] [nvarchar](4000) NULL,\n\t[State] [nvarchar](4000) NULL,\n\t[City] [nvarchar](4000) NULL,\n\t[Revenue] [nvarchar](4000) NULL,\n\t[RevenueTarget] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",

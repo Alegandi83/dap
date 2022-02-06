@@ -1,8 +1,15 @@
 {
-	"name": "Taxi EDA Train",
+	"name": "02_taxi_eda_train",
 	"properties": {
+		"folder": {
+			"name": "taxi_spk_pool"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "synspdev00006",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -13,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0c502f5f-a035-4c75-92f2-d2d1555e5be7"
+				"spark.autotune.trackingId": "581bbf04-a326-4969-a158-58fa9a34794d"
 			}
 		},
 		"metadata": {
@@ -25,6 +32,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/ag83-00006-dev-rg/providers/Microsoft.Synapse/workspaces/ag83-syws-dev-00006/bigDataPools/synspdev00006",
+				"name": "synspdev00006",
+				"type": "Spark",
+				"endpoint": "https://ag83-syws-dev-00006.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synspdev00006",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -87,11 +109,17 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
 				"source": [
 					"#To make development easier, faster and less expensive downsample for now\n",
-					"sampled_taxi_df = nyc_tlc_df.sample(True, 0.001, seed=1234)"
+					"sampled_taxi_df = nyc_tlc_df.sample(True, 0.001, seed=1234)\n",
+					"\n",
+					"#sampled_taxi_df.show(5)\n",
+					"display(sampled_taxi_df)"
 				],
-				"execution_count": 3
+				"execution_count": 9
 			},
 			{
 				"cell_type": "markdown",
@@ -164,7 +192,7 @@
 					"                                & (sampled_taxi_df.paymentType.isin({\"1\", \"2\"}))\n",
 					"                                )"
 				],
-				"execution_count": 5
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -190,7 +218,7 @@
 					"                                              )\\\n",
 					"                                       .filter((taxi_df.tripTimeSecs >= 30) & (taxi_df.tripTimeSecs <= 7200))"
 				],
-				"execution_count": 6
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -217,7 +245,7 @@
 					"# Create a new dataframe that has had the encodings applied\n",
 					"encoded_final_df = Pipeline(stages=[sI1, en1, sI2, en2]).fit(taxi_featurised_df).transform(taxi_featurised_df)"
 				],
-				"execution_count": 7
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +266,7 @@
 					"# Split the dataframe into test and training dataframes\n",
 					"train_data_df, test_data_df = encoded_final_df.randomSplit([trainingFraction, testingFraction], seed=seed)"
 				],
-				"execution_count": 8
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -272,7 +300,7 @@
 					"metrics = BinaryClassificationMetrics(predictionAndLabels)\n",
 					"print(\"Area under ROC = %s\" % metrics.areaUnderROC)"
 				],
-				"execution_count": 9
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",

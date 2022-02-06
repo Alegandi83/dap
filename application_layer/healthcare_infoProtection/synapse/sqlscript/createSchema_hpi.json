@@ -2,7 +2,7 @@
 	"name": "createSchema_hpi",
 	"properties": {
 		"folder": {
-			"name": "hpi_sql_pool/createTables"
+			"name": "hpi_sql_dedicated_pool/createTables"
 		},
 		"content": {
 			"query": "CREATE SCHEMA hpi;\nGO",

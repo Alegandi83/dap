@@ -2,7 +2,7 @@
 	"name": "createTable_HospitalEmpPIIData",
 	"properties": {
 		"folder": {
-			"name": "hpi_sql_pool/createTables"
+			"name": "hpi_sql_dedicated_pool/createTables"
 		},
 		"content": {
 			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [hpi].[HospitalEmpPIIData]\n(\n\t[Id] [int] NULL,\n\t[EmpName] [nvarchar](61) NULL,\n\t[Address] [nvarchar](30) NULL,\n\t[City] [nvarchar](30) NULL,\n\t[County] [nvarchar](30) NULL,\n\t[State] [nvarchar](10) NULL,\n\t[Phone] [varchar](100) NULL,\n\t[Email] [varchar](100) NULL,\n\t[Designation] [varchar](20) NULL,\n\t[SSN] [varchar](100) NULL,\n\t[SSN_encrypted] [nvarchar](100) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
