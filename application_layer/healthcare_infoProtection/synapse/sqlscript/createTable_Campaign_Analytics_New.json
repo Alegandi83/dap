@@ -2,7 +2,7 @@
 	"name": "createTable_Campaign_Analytics_New",
 	"properties": {
 		"folder": {
-			"name": "healthcare_information_protection/createTables"
+			"name": "hpi_sql_pool/createTables"
 		},
 		"content": {
 			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE TABLE [hpi].[Campaign_Analytics_New]\n(\n\t[Region] [nvarchar](4000) NULL,\n\t[Country] [nvarchar](4000) NULL,\n\t[Campaign_Name] [nvarchar](4000) NULL,\n\t[Revenue] [nvarchar](4000) NULL,\n\t[Revenue_Target] [nvarchar](4000) NULL,\n\t[City] [nvarchar](4000) NULL,\n\t[State] [nvarchar](4000) NULL,\n\t[RoleID] [nvarchar](4000) NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
