@@ -1,0 +1,18 @@
+{
+	"name": "Ls_AzureMLService_01",
+	"properties": {
+		"description": "Azure ML Linked Service",
+		"annotations": [],
+		"type": "AzureMLService",
+		"typeProperties": {
+			"subscriptionId": "272f5f06-6693-48ae-975b-b5c7553539c2",
+			"resourceGroupName": "ag83-00006-dev-rg",
+			"mlWorkspaceName": "ag83-amlws-dev-00006",
+			"authentication": "MSI"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
