@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b99e282a-cc07-44e7-8df7-485134dadce2"
+				"spark.autotune.trackingId": "8fb2545c-3e41-4fa1-85e0-cd4a721331e5"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"import seaborn as sns\r\n",
 					"import pandas as pd"
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -83,7 +83,7 @@
 					"nyc_tlc = NycTlcYellow(start_date=start_date, end_date=end_date)\r\n",
 					"df = nyc_tlc.to_spark_dataframe()"
 				],
-				"execution_count": 2
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -113,7 +113,7 @@
 					"\r\n",
 					"filtered_df.createOrReplaceTempView(\"taxi_dataset\")"
 				],
-				"execution_count": 3
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,8 @@
 					},
 					"microsoft": {
 						"language": "sparksql"
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"%%sql\r\n",
@@ -143,7 +144,7 @@
 					"GROUP BY day_of_month\r\n",
 					"ORDER BY day_of_month ASC"
 				],
-				"execution_count": 6
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -163,9 +164,12 @@
 					"sampled_taxi_df = filtered_df.sample(True, 0.001, seed=1234)\r\n",
 					"\r\n",
 					"# The charting package needs a Pandas DataFrame or NumPy array to do the conversion\r\n",
-					"sampled_taxi_pd_df = sampled_taxi_df.toPandas()"
+					"sampled_taxi_pd_df = sampled_taxi_df.toPandas()\r\n",
+					"\r\n",
+					"#sampled_taxi_df.show(5)\r\n",
+					"display(sampled_taxi_df)"
 				],
-				"execution_count": 5
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -190,7 +194,7 @@
 					"plt.suptitle('')\r\n",
 					"plt.show()"
 				],
-				"execution_count": 7
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -213,7 +217,7 @@
 					"ax.set_ylabel('Tip Amount ($)')\r\n",
 					"plt.show()"
 				],
-				"execution_count": 8
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -238,7 +242,7 @@
 					"plt.suptitle('')\r\n",
 					"plt.show()"
 				],
-				"execution_count": 9
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -264,7 +268,7 @@
 					"plt.suptitle('')\r\n",
 					"plt.show()"
 				],
-				"execution_count": 10
+				"execution_count": 11
 			}
 		]
 	}

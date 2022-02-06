@@ -1,5 +1,5 @@
 {
-	"name": "00_taxi_create_spark_table",
+	"name": "00_taxi_create_table",
 	"properties": {
 		"folder": {
 			"name": "taxi_spk_pool"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "66cd4b2e-4b0f-4f50-b67e-bda5a70a7ed6"
+				"spark.autotune.trackingId": "c36f424b-6530-4034-8aa3-c1db6e15f599"
 			}
 		},
 		"metadata": {
@@ -78,7 +78,7 @@
 					"nyc_tlc_df = nyc_tlc.to_pandas_dataframe()\r\n",
 					"nyc_tlc_df.info()"
 				],
-				"execution_count": 2
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -100,7 +100,7 @@
 					"sampled_df = nyc_tlc_df.sample(n=10000, random_state=123)\r\n",
 					"display(sampled_df.head(5))"
 				],
-				"execution_count": 3
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -161,7 +161,7 @@
 					"display(featurized_df.head(5))\r\n",
 					""
 				],
-				"execution_count": 4
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -187,7 +187,7 @@
 					"\r\n",
 					"filtered_df.info()"
 				],
-				"execution_count": 5
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -218,9 +218,9 @@
 				},
 				"source": [
 					"spark_df = spark.createDataFrame(filtered_df)\r\n",
-					"spark_df.write.mode(\"overwrite\").saveAsTable(\"taxi.NYC_Taxi\")"
+					"spark_df.write.mode(\"overwrite\").saveAsTable(\"default.NYC_Taxi\")"
 				],
-				"execution_count": 9
+				"execution_count": 6
 			}
 		]
 	}
