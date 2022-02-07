@@ -1,5 +1,5 @@
 {
-	"name": "02_taxi_eda_train",
+	"name": "02_taxi_train_mllib",
 	"properties": {
 		"folder": {
 			"name": "taxi_spk_pool"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3f971b88-8820-474d-92c6-beb0b1294d5f"
+				"spark.autotune.trackingId": "e38713e0-305d-41dd-8418-998d62f01ef3"
 			}
 		},
 		"metadata": {
