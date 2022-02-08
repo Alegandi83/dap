@@ -2,7 +2,7 @@
 	"name": "createExternalTable_PatientInformation",
 	"properties": {
 		"folder": {
-			"name": "healthcare_information_protection/createTables"
+			"name": "hpi_sql_dedicated_pool/createTables"
 		},
 		"content": {
 			"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t USE_TYPE_DEFAULT = FALSE\n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'hpi_ag83stdev00006_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [hpi_ag83stdev00006_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://hpi@ag83stdev00006.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE patientInfo (\n\t[Patient Name] nvarchar(4000),\n\t[Gender] nvarchar(4000),\n\t[Phone] nvarchar(4000),\n\t[Mail] nvarchar(4000),\n\t[Medical Insurance Card] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'PatientInformation/**',\n\tDATA_SOURCE = [hpi_ag83stdev00006_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\n\nSELECT * FROM patientInfo",

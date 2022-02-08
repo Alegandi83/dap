@@ -2,7 +2,7 @@
 	"name": "createSchema_hpi",
 	"properties": {
 		"folder": {
-			"name": "healthcare_information_protection/createTables"
+			"name": "hpi_sql_dedicated_pool/createTables"
 		},
 		"content": {
 			"query": "CREATE SCHEMA hpi;\nGO",

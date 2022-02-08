@@ -2,7 +2,7 @@
 	"name": "Hpi Campaign Analytics DataPrep",
 	"properties": {
 		"folder": {
-			"name": "healthcare_information_protection"
+			"name": "hpi_spk_pool"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5e9dbc0d-d290-4556-b0e3-99e13c635aac"
+				"spark.autotune.trackingId": "0cf7fa14-8f62-4472-9673-12d4da6f70ba"
 			}
 		},
 		"metadata": {

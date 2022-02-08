@@ -2,7 +2,7 @@
 	"name": "SP_RLS_ChiefOperatingManager",
 	"properties": {
 		"folder": {
-			"name": "healthcare_information_protection/storedProcedures"
+			"name": "hpi_sql_dedicated_pool/storedProcedures"
 		},
 		"content": {
 			"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\nCREATE PROC [hpi].[SP_RLS_ChiefOperatingManager] AS\nEXECUTE AS USER = 'ChiefOperatingManager';  \nSELECT * FROM [HealthCare-FactSales];\nrevert;\nGO",

@@ -1,0 +1,453 @@
+{
+	"name": "03_taxi_train_aml",
+	"properties": {
+		"folder": {
+			"name": "taxi_spk_pool"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "synspdev00006",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "8cd96513-ffe6-4f16-8af8-9e1f8063cadb"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2/resourceGroups/ag83-00006-dev-rg/providers/Microsoft.Synapse/workspaces/ag83-syws-dev-00006/bigDataPools/synspdev00006",
+				"name": "synspdev00006",
+				"type": "Spark",
+				"endpoint": "https://ag83-syws-dev-00006.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synspdev00006",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"blob_account_name = \"azureopendatastorage\"\r\n",
+					"blob_container_name = \"nyctlc\"\r\n",
+					"blob_relative_path = \"yellow\"\r\n",
+					"blob_sas_token = r\"\"\r\n",
+					"\r\n",
+					"# Allow Spark to read from the blob remotely\r\n",
+					"wasbs_path = 'wasbs://%s@%s.blob.core.windows.net/%s' % (blob_container_name, blob_account_name, blob_relative_path)\r\n",
+					"spark.conf.set('fs.azure.sas.%s.%s.blob.core.windows.net' % (blob_container_name, blob_account_name),blob_sas_token)\r\n",
+					"\r\n",
+					"# Spark read parquet; note that it won't load any data yet\r\n",
+					"df = spark.read.parquet(wasbs_path)"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Create an ingestion filter\r\n",
+					"start_date = '2015-01-01 00:00:00'\r\n",
+					"end_date = '2015-12-31 00:00:00'\r\n",
+					"\r\n",
+					"filtered_df = df.filter('tpepPickupDateTime > \"' + start_date + '\" and tpepPickupDateTime< \"' + end_date + '\"')\r\n",
+					"\r\n",
+					"filtered_df.describe().show()"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from datetime import datetime\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"# To make development easier, faster, and less expensive, downsample for now\r\n",
+					"sampled_taxi_df = filtered_df.sample(True, 0.001, seed=1234)\r\n",
+					"\r\n",
+					"taxi_df = sampled_taxi_df.select('vendorID', 'passengerCount', 'tripDistance',  'startLon', 'startLat', 'endLon' \\\r\n",
+					"                                , 'endLat', 'paymentType', 'fareAmount', 'tipAmount'\\\r\n",
+					"                                , column('puMonth').alias('month_num') \\\r\n",
+					"                                , date_format('tpepPickupDateTime', 'hh').alias('hour_of_day')\\\r\n",
+					"                                , date_format('tpepPickupDateTime', 'EEEE').alias('day_of_week')\\\r\n",
+					"                                , dayofmonth(col('tpepPickupDateTime')).alias('day_of_month')\r\n",
+					"                                ,(unix_timestamp(col('tpepDropoffDateTime')) - unix_timestamp(col('tpepPickupDateTime'))).alias('trip_time'))\\\r\n",
+					"                        .filter((sampled_taxi_df.passengerCount > 0) & (sampled_taxi_df.passengerCount < 8)\\\r\n",
+					"                                & (sampled_taxi_df.tipAmount >= 0)\\\r\n",
+					"                                & (sampled_taxi_df.fareAmount >= 1) & (sampled_taxi_df.fareAmount <= 250)\\\r\n",
+					"                                & (sampled_taxi_df.tipAmount < sampled_taxi_df.fareAmount)\\\r\n",
+					"                                & (sampled_taxi_df.tripDistance > 0) & (sampled_taxi_df.tripDistance <= 200)\\\r\n",
+					"                                & (sampled_taxi_df.rateCodeId <= 5)\\\r\n",
+					"                                & (sampled_taxi_df.paymentType.isin({\"1\", \"2\"})))\r\n",
+					"taxi_df.show(10)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Random split dataset using Spark; convert Spark to pandas\r\n",
+					"training_data, validation_data = taxi_df.randomSplit([0.8,0.2], 223)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Connect to an Azure Machine Learning Workspace\r\n",
+					"from azureml.core import Workspace\r\n",
+					"\r\n",
+					"# Enter your workspace subscription, resource group, name, and region.\r\n",
+					"subscription_id = \"<enter your subscription ID>\" #you should be owner or contributor\r\n",
+					"resource_group = \"<enter your resource group>\" #you should be owner or contributor\r\n",
+					"workspace_name = \"<enter your workspace name>\" #your workspace name\r\n",
+					"workspace_region = \"<enter workspace region>\" #your region\r\n",
+					"\r\n",
+					"ws = Workspace(workspace_name = workspace_name,\r\n",
+					"               subscription_id = subscription_id,\r\n",
+					"               resource_group = resource_group)\r\n",
+					"\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import pandas \r\n",
+					"from azureml.core import Dataset\r\n",
+					"\r\n",
+					"# Get the Azure Machine Learning default datastore\r\n",
+					"datastore = ws.get_default_datastore()\r\n",
+					"training_pd = training_data.toPandas().to_csv('training_pd.csv', index=False)\r\n",
+					"\r\n",
+					"# Convert into an Azure Machine Learning tabular dataset\r\n",
+					"datastore.upload_files(files = ['training_pd.csv'],\r\n",
+					"                       target_path = 'train-dataset/tabular/',\r\n",
+					"                       overwrite = True,\r\n",
+					"                       show_progress = True)\r\n",
+					"dataset_training = Dataset.Tabular.from_delimited_files(path = [(datastore, 'train-dataset/tabular/training_pd.csv')])"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Submit an automated experiment\r\n",
+					"import logging\r\n",
+					"\r\n",
+					"# Define training Settings\r\n",
+					"automl_settings = {\r\n",
+					"    \"iteration_timeout_minutes\": 10,\r\n",
+					"    \"experiment_timeout_minutes\": 30,\r\n",
+					"    \"enable_early_stopping\": True,\r\n",
+					"    \"primary_metric\": 'r2_score',\r\n",
+					"    \"featurization\": 'auto',\r\n",
+					"    \"verbosity\": logging.INFO,\r\n",
+					"    \"n_cross_validations\": 2}"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from azureml.train.automl import AutoMLConfig\r\n",
+					"\r\n",
+					"automl_config = AutoMLConfig(task='regression',\r\n",
+					"                             debug_log='automated_ml_errors.log',\r\n",
+					"                             training_data = dataset_training,\r\n",
+					"                             spark_context = sc,\r\n",
+					"                             model_explainability = False, \r\n",
+					"                             label_column_name =\"fareAmount\",**automl_settings)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Training the Automatic Regression Model\r\n",
+					"from azureml.core.experiment import Experiment\r\n",
+					"\r\n",
+					"# Start an experiment in Azure Machine Learning\r\n",
+					"experiment = Experiment(ws, \"aml-synapse-regression\")\r\n",
+					"tags = {\"Synapse\": \"regression\"}\r\n",
+					"local_run = experiment.submit(automl_config, show_output=True, tags = tags)\r\n",
+					"\r\n",
+					"# Use the get_details function to retrieve the detailed output for the run.\r\n",
+					"run_details = local_run.get_details()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Get best model\r\n",
+					"best_run, fitted_model = local_run.get_output()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Test best model accuracy\r\n",
+					"validation_data_pd = validation_data.toPandas()\r\n",
+					"y_test = validation_data_pd.pop(\"fareAmount\").to_frame()\r\n",
+					"y_predict = fitted_model.predict(validation_data_pd)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from sklearn.metrics import mean_squared_error\r\n",
+					"from math import sqrt\r\n",
+					"\r\n",
+					"# Calculate root-mean-square error\r\n",
+					"y_actual = y_test.values.flatten().tolist()\r\n",
+					"rmse = sqrt(mean_squared_error(y_actual, y_predict))\r\n",
+					"\r\n",
+					"print(\"Root Mean Square Error:\")\r\n",
+					"print(rmse)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Calculate mean-absolute-percent error and model accuracy \r\n",
+					"sum_actuals = sum_errors = 0\r\n",
+					"\r\n",
+					"for actual_val, predict_val in zip(y_actual, y_predict):\r\n",
+					"    abs_error = actual_val - predict_val\r\n",
+					"    if abs_error < 0:\r\n",
+					"        abs_error = abs_error * -1\r\n",
+					"\r\n",
+					"    sum_errors = sum_errors + abs_error\r\n",
+					"    sum_actuals = sum_actuals + actual_val\r\n",
+					"\r\n",
+					"mean_abs_percent_error = sum_errors / sum_actuals\r\n",
+					"\r\n",
+					"print(\"Model MAPE:\")\r\n",
+					"print(mean_abs_percent_error)\r\n",
+					"print()\r\n",
+					"print(\"Model Accuracy:\")\r\n",
+					"print(1 - mean_abs_percent_error)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import matplotlib.pyplot as plt\r\n",
+					"import numpy as np\r\n",
+					"from sklearn.metrics import mean_squared_error, r2_score\r\n",
+					"\r\n",
+					"# Calculate the R2 score by using the predicted and actual fare prices\r\n",
+					"y_test_actual = y_test[\"fareAmount\"]\r\n",
+					"r2 = r2_score(y_test_actual, y_predict)\r\n",
+					"\r\n",
+					"# Plot the actual versus predicted fare amount values\r\n",
+					"plt.style.use('ggplot')\r\n",
+					"plt.figure(figsize=(10, 7))\r\n",
+					"plt.scatter(y_test_actual,y_predict)\r\n",
+					"plt.plot([np.min(y_test_actual), np.max(y_test_actual)], [np.min(y_test_actual), np.max(y_test_actual)], color='lightblue')\r\n",
+					"plt.xlabel(\"Actual Fare Amount\")\r\n",
+					"plt.ylabel(\"Predicted Fare Amount\")\r\n",
+					"plt.title(\"Actual vs Predicted Fare Amount R^2={}\".format(r2))\r\n",
+					"plt.show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Register the model to Azure Machine Learning\r\n",
+					"description = 'My automated ML model'\r\n",
+					"model_path='outputs/model.pkl'\r\n",
+					"model = best_run.register_model(model_name = 'NYCGreenTaxiModel', model_path = model_path, description = description)\r\n",
+					"print(model.name, model.version)"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
