@@ -1,0 +1,16 @@
+{
+	"name": "analyze_TemperatureEvent",
+	"properties": {
+		"content": {
+			"query": "temp_event\n| take 1000\n\n['temp_event'] \n| count",
+			"metadata": {
+				"language": "kql"
+			},
+			"currentConnection": {
+				"poolName": "synadxdev00006",
+				"databaseName": "synadxdbdev00006"
+			}
+		},
+		"type": "KqlQuery"
+	}
+}
