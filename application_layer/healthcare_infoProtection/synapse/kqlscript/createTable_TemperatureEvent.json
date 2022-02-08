@@ -1,0 +1,12 @@
+{
+	"name": "createTable_TemperatureEvent",
+	"properties": {
+		"content": {
+			"query": "// Create table command\n////////////////////////////////////////////////////////////\n.create table ['temp_event']  (['deviceId']:string, ['temperature']:int, ['time']:datetime)\n\n// Create mapping command\n////////////////////////////////////////////////////////////\n.create table ['temp_event'] ingestion json mapping 'temp_event_mapping' '[{\"column\":\"deviceId\", \"Properties\":{\"Path\":\"$[\\'deviceId\\']\"}},{\"column\":\"temperature\", \"Properties\":{\"Path\":\"$[\\'temperature\\']\"}},{\"column\":\"time\", \"Properties\":{\"Path\":\"$[\\'time\\']\"}}]'",
+			"metadata": {
+				"language": "kql"
+			}
+		},
+		"type": "KqlQuery"
+	}
+}
