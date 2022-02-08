@@ -8,6 +8,10 @@ param mainStorageAccount string = '${project}st${env}${deployment_id}'
 param synStorageFileSys string = 'synapsedefaultfs'
 param purview_name string = '${project}pview${env}${deployment_id}'
 
+param synapseSparkPoolName string = 'synsp${env}${deployment_id}'
+param synapseADXPoolName string = 'synadx${env}${deployment_id}'
+param synapseADXDatabaseName string = 'synadxdb${env}${deployment_id}'
+
 param synapse_sqlpool_admin_username string = 'sqlAdmin'
 @secure()
 param synapse_sqlpool_admin_password string
@@ -63,9 +67,9 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-03-01' = {
   }
 }
 
-resource synapse_spark_sql_pool 'Microsoft.Synapse/workspaces/bigDataPools@2021-03-01' = {
+resource synapse_spark_pool 'Microsoft.Synapse/workspaces/bigDataPools@2021-03-01' = {
   parent: synapseWorkspace
-  name: 'synsp${env}${deployment_id}'
+  name: synapseSparkPoolName
   location: location
   tags: {
     DisplayName: 'Spark SQL Pool'
@@ -122,14 +126,47 @@ resource synapseWorkspaceFirewallRule1 'Microsoft.Synapse/workspaces/firewallrul
 }
 
 
+resource synapse_adx_pool 'Microsoft.Synapse/workspaces/kustoPools@2021-06-01-preview' = {
+  parent: synapseWorkspace
+  name: synapseADXPoolName
+  location: location
+  tags: {
+    DisplayName: 'Data Explorer Pool'
+    Environment: env
+  }  
+  sku: {
+    capacity: 2
+    name: 'Compute optimized'
+    size: 'Extra small'
+  }
+  properties: {
+    enablePurge: false
+    workspaceUID: synapseWorkspace.properties.workspaceUID
+    enableStreamingIngest: true
+    optimizedAutoscale: {
+      isEnabled: false
+      maximum: 2
+      minimum: 2
+      version: 1
+    }
+  }
+
+  resource adxDatabase 'databases' = {
+    name: synapseADXDatabaseName
+    kind: 'ReadWrite'
+    location: location
+  }
+}
+
 output synapseWorkspaceName string = synapseWorkspace.name
 output synapse_principal_id string = synapseWorkspace.identity.principalId
 output synapseDefaultStorageAccountName string = synStorage.name
-output synapseBigdataPoolName string = synapse_spark_sql_pool.name
+output synapseBigdataPoolName string = synapse_spark_pool.name
 output synapse_sql_pool_output object = {
   username: synapseWorkspace.properties.sqlAdministratorLogin
   password: synapse_sqlpool_admin_password
   synapse_pool_name: synapse_sql_pool.name
 }
 
-
+output synapse_sprk_pool_name string = synapse_spark_pool.name
+output synapse_adx_pool_name string = synapse_adx_pool.name

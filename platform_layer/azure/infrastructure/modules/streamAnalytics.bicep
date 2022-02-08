@@ -19,6 +19,5 @@ resource streamAnalyticsJob 'Microsoft.StreamAnalytics/streamingjobs@2020-03-01'
 }
 
 
-output streamAnalyticsIdentityPrincipalID string = streamAnalyticsJob.identity.principalId
-output streamAnalyticsJobID string = streamAnalyticsJob.id
 output streamAnalyticsJobName string = streamAnalyticsJob.name
+output streamAnalyticsJobID string = streamAnalyticsJob.id

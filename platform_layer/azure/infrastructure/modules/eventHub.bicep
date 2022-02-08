@@ -4,7 +4,7 @@ param location string = resourceGroup().location
 param deployment_id string
 
 
-resource eventHubNamespace 'Microsoft.EventHub/namespaces@2021-11-01'{
+resource eventHubNamespace 'Microsoft.EventHub/namespaces@2021-11-01' = {
   name: '${project}-evh-${env}-${deployment_id}'
   location: location
   sku:{

@@ -45,6 +45,7 @@ resource sql_server 'Microsoft.Sql/servers@2021-02-01-preview' = {
   }
 }
 
+
 output synapse_sql_pool_output object = {
   name: sql_server.name
   username: sql_server_username

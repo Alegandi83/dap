@@ -145,6 +145,52 @@ module diagnostic './modules/diagnostic_settings.bicep' = {
   ]
 }
 
+
+
+module eventHub './modules/eventHub.bicep' = {
+  name: 'eventHub_deploy_${deployment_id}'
+  params: {
+    project: project
+    env: env
+    location: location
+    deployment_id: deployment_id
+  }
+}
+
+module streamAnalytics './modules/streamAnalytics.bicep' = {
+  name: 'streamAnalytics_deploy_${deployment_id}'
+  params: {
+    project: project
+    env: env
+    location: location
+    deployment_id: deployment_id
+  }
+}
+
+module machineLearning './modules/aml_workspace.bicep' = {
+  name: 'amlWorkspace_deploy_${deployment_id}'
+  params: {
+    project: project
+    env: env
+    location: location
+    deployment_id: deployment_id
+  }
+}
+
+
+module aml_services './modules/aml_service_connections.bicep' = {
+  name: 'amlServices_deploy_${deployment_id}'
+  params: {
+    project: project
+    env: env
+    location: location
+    deployment_id: deployment_id
+  }
+  dependsOn:[
+    machineLearning
+  ]  
+}
+
 //********************************************************
 // RBAC Role Assignments
 //********************************************************
@@ -163,6 +209,9 @@ module RBACRoleAssignment 'modules/RBAC_deploy.bicep' = {
     appinsights
     loganalytics
     diagnostic
+    eventHub
+    streamAnalytics
+    machineLearning
   ]
   params: {
     project: project
@@ -197,6 +246,7 @@ resource script 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 }
 */
 
+
 output storage_account_name string = storage.outputs.storage_account_name
 
 output sql_server_name string = sql.outputs.sql_server_name
@@ -220,3 +270,8 @@ output keyvault_resource_id string = keyvault.outputs.keyvault_resource_id
 output loganalytics_name string = loganalytics.outputs.loganalyticswsname
 output appinsights_name string = appinsights.outputs.appinsights_name
 
+output eventHub_name string = eventHub.outputs.eventHubNamespaceName
+output eventHub_id string = eventHub.outputs.eventHubNamespaceID
+
+output streamAnalytics_name string = streamAnalytics.outputs.streamAnalyticsJobName
+output streamAnalytics_id string = streamAnalytics.outputs.streamAnalyticsJobID
