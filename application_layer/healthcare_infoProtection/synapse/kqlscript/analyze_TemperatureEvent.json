@@ -2,7 +2,7 @@
 	"name": "analyze_TemperatureEvent",
 	"properties": {
 		"content": {
-			"query": "['temp_event']\n\n['temp_event']\n| summarize C=count()\n\ntemp_event\n| take 1000\n\ntemp_event\n| where temperature > 10 and temperature <= 25\n\n",
+			"query": "['temp_event']\n\n['temp_event']\n| summarize C=count()\n\ntemp_event\n| take 1000\n\ntemp_event\n| where temperature > 10 and temperature <= 25\n\n\n['temp_event']\n| where ['time'] >= datetime('2022-02-14')\n| order by ['time'] desc\n",
 			"metadata": {
 				"language": "kql"
 			},
