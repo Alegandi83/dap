@@ -185,9 +185,11 @@ module aml_services './modules/aml_service_connections.bicep' = {
     env: env
     location: location
     deployment_id: deployment_id
+    synapse_sprk_pool_id: synapse.outputs.synapse_sprk_pool_id
   }
   dependsOn:[
     machineLearning
+    synapse
   ]  
 }
 

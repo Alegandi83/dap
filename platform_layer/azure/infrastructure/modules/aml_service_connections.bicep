@@ -4,7 +4,7 @@ param env string
 param location string = resourceGroup().location
 param deployment_id string
 
-
+param synapse_sprk_pool_id string
 param synWorkspace_name string = '${project}-syws-${env}-${deployment_id}'
 param synSparkPool_name string = 'synsp${env}${deployment_id}'
 param amlWorkspace_name string = '${project}-amlws-${env}-${deployment_id}'
@@ -57,17 +57,17 @@ resource amlWorkspace 'Microsoft.MachineLearningServices/workspaces@2021-07-01' 
   }]
 }
 
-/*
+
 resource amlSynapseSparkCompute 'Microsoft.MachineLearningServices/workspaces/computes@2021-04-01' = {
   parent: amlWorkspace
   name: synSparkPool_name
   location: location
   properties:{
     computeType:'SynapseSpark'
-    resourceId: synSparkPool.id
+    resourceId: synapse_sprk_pool_id
   }
 }
-*/
+
 
 
 resource amlSynapseLinkedService 'Microsoft.MachineLearningServices/workspaces/linkedServices@2020-09-01-preview' = {

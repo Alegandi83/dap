@@ -125,7 +125,7 @@ resource synapseWorkspaceFirewallRule1 'Microsoft.Synapse/workspaces/firewallrul
   }
 }
 
-
+/*
 resource synapse_adx_pool 'Microsoft.Synapse/workspaces/kustoPools@2021-06-01-preview' = {
   parent: synapseWorkspace
   name: synapseADXPoolName
@@ -157,6 +157,7 @@ resource synapse_adx_pool 'Microsoft.Synapse/workspaces/kustoPools@2021-06-01-pr
     location: location
   }
 }
+*/
 
 output synapseWorkspaceName string = synapseWorkspace.name
 output synapse_principal_id string = synapseWorkspace.identity.principalId
@@ -169,4 +170,5 @@ output synapse_sql_pool_output object = {
 }
 
 output synapse_sprk_pool_name string = synapse_spark_pool.name
-output synapse_adx_pool_name string = synapse_adx_pool.name
+output synapse_sprk_pool_id string = synapse_spark_pool.id
+//output synapse_adx_pool_name string = synapse_adx_pool.name
