@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#########################
+# STORAGE
+
 # Create folders for SQL external tables
 az storage fs directory create -n '/data/dw/fact_parking' -f $storage_file_system --account-name "$azure_storage_account" --account-key "$azure_storage_key"
 az storage fs directory create -n '/data/dw/dim_st_marker' -f $storage_file_system --account-name "$azure_storage_account" --account-key "$azure_storage_key"
@@ -11,3 +14,11 @@ az storage blob upload --container-name $storage_file_system --account-name "$az
     --file data/seed/dim_date.csv --name "data/dim_date/dim_date.csv"
 az storage blob upload --container-name $storage_file_system --account-name "$azure_storage_account" --account-key "$azure_storage_key" \
     --file data/seed/dim_time.csv --name "data/dim_time/dim_time.csv"
+
+
+####################
+# SYNAPSE ANALYTICS
+
+# Update Synapse LinkedServices to point to newly Databricks workspace URL
+synTempDir=.tmp/synapse
+mkdir -p $synTempDir && cp -a synapse/ .tmp/

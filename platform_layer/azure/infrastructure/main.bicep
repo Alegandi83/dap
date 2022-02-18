@@ -196,7 +196,7 @@ module aml_services './modules/aml_service_connections.bicep' = {
 //********************************************************
 // RBAC Role Assignments
 //********************************************************
-
+/*
 module RBACRoleAssignment 'modules/RBAC_deploy.bicep' = {
   name: 'RBACRoleAssignmentDeploy'
   dependsOn:[
@@ -221,6 +221,7 @@ module RBACRoleAssignment 'modules/RBAC_deploy.bicep' = {
     deployment_id: deployment_id
   }
 }
+*/
 
 /*
 // Purview Data Plane Operations

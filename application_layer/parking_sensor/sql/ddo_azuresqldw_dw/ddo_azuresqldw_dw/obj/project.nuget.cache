@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "CXavxC58VOmMxCdOnIaADxI2+3Tfl9QfF8xIVZh6QxwjbClk/Q8rJsoZTUYHkymRX2Of5UpagejY4YqLEj2tdw==",
+  "success": true,
+  "projectFilePath": "c:\\code\\modern-data-warehouse-dataops\\e2e_samples\\parking_sensors_synapse\\platform_layer\\azure\\sql\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw.sqlproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\agandini\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.0\\microsoft.netframework.referenceassemblies.1.0.0.nupkg.sha512",
+    "C:\\Users\\agandini\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net46\\1.0.0\\microsoft.netframework.referenceassemblies.net46.1.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

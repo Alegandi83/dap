@@ -286,11 +286,31 @@ UploadSql "create_purview_user"
 
 
 # Start Deploy Use Case - Parking Sensor ------------------------------------------
-createLinkedService "Ls_Rest_MelParkSensors_01"
-createDataset "Ds_AdlsGen2_MelbParkingData"
-createDataset "Ds_REST_MelbParkingData"
-createPipeline "P_Ingest_MelbParkingData"
-createTrigger "T_Sched"
+
+
+# Build requirement.txt string to upload in the Spark Configuration
+configurationList=""
+while read -r p; do 
+    line=$(echo "$p" | tr -d '\r' | tr -d '\n')
+    if [ "$configurationList" != "" ]; then configurationList="$configurationList$line\r\n" ; else configurationList="$line\r\n"; fi
+done < $requirementsFileName
+
+# Build packages list to upload in the Spark Pool, upload packages to synapse workspace
+libraryList=""
+for file in "$packagesDirectory"*.whl; do
+    filename=${file##*/}
+    librariesToUpload="{
+        \"name\": \"${filename}\",
+        \"path\": \"${SYNAPSE_WORKSPACE_NAME}/libraries/${filename}\",
+        \"containerName\": \"prep\",
+        \"type\": \"whl\"
+    }"
+    if [ "$libraryList" != "" ]; then libraryList=${libraryList}","${librariesToUpload}; else libraryList=${librariesToUpload};fi
+    uploadSynapsePackagesToWorkspace "${filename}"
+done
+customlibraryList="customLibraries:[$libraryList],"
+uploadSynapseArtifactsToSparkPool "${configurationList}" "${customlibraryList}"
+
 
 # This line allows the spark pool to be available to attach to the notebooks
 az synapse spark session list --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
@@ -299,6 +319,13 @@ createNotebook "01a_explore"
 createNotebook "01b_explore_sqlserverless"
 createNotebook "02_standardize"
 createNotebook "03_transform"
+
+# Pipeline and Datasets
+createLinkedService "Ls_Rest_MelParkSensors_01"
+createDataset "Ds_AdlsGen2_MelbParkingData"
+createDataset "Ds_REST_MelbParkingData"
+createPipeline "P_Ingest_MelbParkingData"
+createTrigger "T_Sched"
 
 # Upload SQL script
 UpdateExternalTableScript

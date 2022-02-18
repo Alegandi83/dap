@@ -1,0 +1,5 @@
+{
+    "dataworkspace.excludedProjects": [
+        "application_layer/ag83dp/sql/ddo_azuresqldw_dw/ddo_azuresqldw_dw/ddo_azuresqldw_dw.sqlproj"
+    ]
+}

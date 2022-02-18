@@ -1,0 +1,11 @@
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\bin\Debug\ddo_azuresqldw_dw.dacpac
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\bin\Debug\ddo_azuresqldw_dw.dll
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\bin\Debug\ddo_azuresqldw_dw.pdb
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\bin\Debug\master.dacpac
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\obj\Debug\ddo_azuresqldw_dw.sqlproj.AssemblyReference.cache
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\obj\Debug\Model.xml
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\obj\Debug\refactor.xml
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\obj\Debug\postdeploy.sql
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\obj\Debug\predeploy.sql
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\obj\Debug\ddo_azuresqldw_dw.dll
+c:\code\modern-data-warehouse-dataops\e2e_samples\parking_sensors_synapse\platform_layer\azure\sql\ddo_azuresqldw_dw\ddo_azuresqldw_dw\obj\Debug\ddo_azuresqldw_dw.pdb

@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "restore": {
+    "c:\\code\\modern-data-warehouse-dataops\\e2e_samples\\parking_sensors_synapse\\platform_layer\\azure\\sql\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw.sqlproj": {}
+  },
+  "projects": {
+    "c:\\code\\modern-data-warehouse-dataops\\e2e_samples\\parking_sensors_synapse\\platform_layer\\azure\\sql\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw.sqlproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "c:\\code\\modern-data-warehouse-dataops\\e2e_samples\\parking_sensors_synapse\\platform_layer\\azure\\sql\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw.sqlproj",
+        "projectName": "ddo_azuresqldw_dw",
+        "projectPath": "c:\\code\\modern-data-warehouse-dataops\\e2e_samples\\parking_sensors_synapse\\platform_layer\\azure\\sql\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw.sqlproj",
+        "packagesPath": "C:\\Users\\agandini\\.nuget\\packages\\",
+        "outputPath": "c:\\code\\modern-data-warehouse-dataops\\e2e_samples\\parking_sensors_synapse\\platform_layer\\azure\\sql\\ddo_azuresqldw_dw\\ddo_azuresqldw_dw\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\agandini\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net46"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net46": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net46": {
+          "dependencies": {
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.0, )"
+            }
+          }
+        }
+      }
+    }
+  }
+}

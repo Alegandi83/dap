@@ -182,7 +182,7 @@ resource roleAssignmentPviewSynWorkspace 'Microsoft.Authorization/roleAssignment
     roleDefinitionId: reader
     principalType:'ServicePrincipal'
   }
-  scope:synapseWorkspace
+  scope: synapseWorkspace
 }
 
 
@@ -198,7 +198,9 @@ resource roleAssignmentAsaEventHubNamespace 'Microsoft.Authorization/roleAssignm
   scope: eventHubNamespace
 }
 
-// AzureStreamAnalytics as Data Contributor on  Data Lake
+// TODO - StreamAnalytics as EventHub Data Receiver on EventHub
+
+// EventHub as Data Contributor on  Data Lake
 //https://docs.microsoft.com/en-us/azure/stream-analytics/blob-output-managed-identity#grant-access-via-the-azure-portal
 resource roleAssignmentAsaSynWorkspace 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
   name: guid(eventHubNamespace.name, mainStorage.name)
@@ -246,3 +248,4 @@ resource roleAssignmentAmlWorkspaceSynWorkspace 'Microsoft.Authorization/roleAss
   }
   scope: mainStorage  
 }
+*/
