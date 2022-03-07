@@ -23,6 +23,10 @@ export resource_group_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-rg"
 export PBI_TENANT_ID=0856a07c-daf4-44cf-acd9-12b9ba5ad6f0
 export PBI_DAP_USR_MAIL=agandini_microsoft.com#EXT#@agandini.onmicrosoft.com
 
+export kv_name="ag83-kv-dev-00006"
+export kv_dns_name=https://${kv_name}.vault.azure.net/
+
+
 --------------------------------------------------------------------------------
 -- Purview Setup script
 
@@ -57,3 +61,33 @@ $pv_service_principal_name = "${project}-pview-${env}-${deployment_id}-sp"
 
 Connect-AzAccount -TenantId 72f988bf-86f1-41af-91ab-2d7cd011db47
 
+--------------------------------------------------------------------------------
+-- Docked SQL Server commands
+
+# show databases
+SELECT name, database_id, create_date FROM sys.databases; GO
+
+# Psw Change
+docker exec -it sql1 /opt/mssql-tools/bin/sqlcmd `
+  -S localhost -U SA -P 'Sqladminpswag83!' `
+  -Q 'ALTER LOGIN SA WITH PASSWORD='Sqladminpswag22!''
+
+# Connection inside container
+docker exec -it sql1 "bash" 
+/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Sqladminpswag83!
+
+# Connection outside container
+ipconfig
+sqlcmd -S localhost,1533 -U SA -P 'Sqladminpswag83!'
+
+# Stop container
+docker stop sql1
+docker rm sql1
+
+# Monitoring  
+docker ps -a
+
+SELECT @@SERVERNAME,
+    SERVERPROPERTY('ComputerNamePhysicalNetBIOS'),
+    SERVERPROPERTY('MachineName'),
+    SERVERPROPERTY('ServerName')

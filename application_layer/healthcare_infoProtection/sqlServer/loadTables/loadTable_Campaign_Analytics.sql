@@ -5,7 +5,7 @@ TRUNCATE TABLE hpi.Campaign_Analytics
 GO
 
 BULK INSERT hpi.Campaign_Analytics
-FROM 'C:\code\dap\application_layer\healthcare_infoProtection\data\Campaign_Analytics.csv'
+FROM '/my_dap_data/Campaign_Analytics.csv'
 WITH
 (
     FIRSTROW = 2,

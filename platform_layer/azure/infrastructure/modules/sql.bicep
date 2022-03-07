@@ -78,49 +78,15 @@ resource sqlserverDatabase 'Microsoft.Sql/servers/databases@2020-11-01-preview' 
     zoneRedundant: false
   }
 }
-/*
-resource sqlserverPrivateEndpoint 'Microsoft.Network/privateEndpoints@2020-11-01' = {
-  name: '${project}sql${env}${deployment_id}-Private-endpoint'
-  location: location
-  tags: {
-    DisplayName: 'SQL Server Private Endpoint'
-    Environment: env
-  }
-  properties: {
-    manualPrivateLinkServiceConnections: []
-    privateLinkServiceConnections: [
-      {
-        name: sqlserverPrivateEndpointName
-        properties: {
-          groupIds: [
-            'sqlServer'
-          ]
-          privateLinkServiceId: sqlserver.id
-          requestMessage: ''
-        }
-      }
-    ]
-    subnet: {
-      id: subnetId
-    }
-  }
-}
 
-resource sqlserverPrivateEndpointARecord 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' = if (!empty(privateDnsZoneIdSqlServer)) {
-  parent: sqlserverPrivateEndpoint
-  name: 'default'
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: '${sqlserverPrivateEndpoint.name}-arecord'
-        properties: {
-          privateDnsZoneId: privateDnsZoneIdSqlServer
-        }
-      }
-    ]
+resource sqlserverFirewallAllowAzure 'Microsoft.Sql/servers/firewallRules@2021-08-01-preview' = {
+  name: 'AllowAllWindowsAzureIps'
+  parent: sqlserver
+  properties:{
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '0.0.0.0'
   }
 }
-*/
 
 
 output sql_server_name string = sqlserver.name

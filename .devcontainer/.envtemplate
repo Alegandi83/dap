@@ -47,3 +47,9 @@ PBI_TENANT_ID=0856a07c-daf4-44cf-acd9-12b9ba5ad6f0
 
 # PowerBI - Dap userEmail registered on PowerBI Tenant
 PBI_DAP_USR_MAIL=agandini_microsoft.com#EXT#@agandini.onmicrosoft.com
+
+# OnPrem SQL Server - Password
+SQLSERVER_PASSWORD=Sqladminpswag83!
+
+# Project Path
+DAP_PROJECT_PATH=c:/code/dap

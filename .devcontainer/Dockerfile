@@ -27,6 +27,28 @@ RUN pip install databricks-cli
 RUN apt-get update \
     && apt-get -y install jq makepasswd
 
+# Install mssql-cli
+# 1/2) adding custom MS repository
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+
+# 2/2) install SQL Server drivers and tools
+RUN apt-get update && ACCEPT_EULA=Y apt-get install -y mssql-cli msodbcsql mssql-tools
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+RUN /bin/bash -c "source ~/.bashrc"
+
+# sqlpackage
+# docker  sqlpackage: https://github.com/markhobson/docker-sqlpackage/blob/master/Dockerfile
+# install sqlpackage: https://docs.microsoft.com/en-us/sql/tools/sqlpackage/sqlpackage-download?view=sql-server-ver15
+ARG SQLPACKAGE_URL=https://download.microsoft.com/download/0/2/0/020aa2fa-f3f2-41ba-bacd-ff15557890d3/sqlpackage-linux-x64-en-US-15.0.5084.2.zip
+RUN apt update \
+	&& apt install -y wget zip libunwind8 \
+	&& wget -O sqlpackage-linux.zip $SQLPACKAGE_URL \
+	&& mkdir /opt/sqlpackage \
+	&& unzip sqlpackage-linux.zip -d /opt/sqlpackage \
+	&& chmod a+x /opt/sqlpackage/sqlpackage \
+	&& ln -s /opt/sqlpackage/sqlpackage /usr/bin/sqlpackage
+
 # Install java
 RUN apt-get install -y openjdk-8-jdk
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64

@@ -16,7 +16,9 @@ services:
     dns:
       # specifying DNS servers here, as the container seems to have trouble resolving the URL for the Azure AD login site
     - 8.8.8.8
-    - 8.8.4.4    
+    - 8.8.4.4
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
     volumes:
       # Update this to wherever you want VS Code to mount the folder of your project
       - ..:/workspace

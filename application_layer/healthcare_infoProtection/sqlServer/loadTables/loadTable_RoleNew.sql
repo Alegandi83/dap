@@ -5,7 +5,7 @@ TRUNCATE TABLE hpi.RoleNew
 GO
 
 BULK INSERT hpi.RoleNew
-FROM 'C:\code\dap\application_layer\healthcare_infoProtection\data\RoleNew.csv'
+FROM '/my_dap_data/RoleNew.csv'
 WITH
 (
     FIRSTROW = 2,

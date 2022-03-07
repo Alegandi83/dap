@@ -92,9 +92,9 @@ echo "Retrieving KeyVault information from the deployment."
 
 kv_name=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_name.value')
 kv_dns_name=https://${kv_name}.vault.azure.net/
+ 
 
-
-# Store in KeyVault
+# Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "kvUrl" --value "$kv_dns_name"
 az keyvault secret set --vault-name "$kv_name" --name "subscriptionId" --value "$AZURE_SUBSCRIPTION_ID"
 
@@ -122,16 +122,21 @@ az storage fs directory create -n '/sys/databricks/libs' -f $storage_file_system
 
 # Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "datalakeAccountName" --value "$azure_storage_account"
+az keyvault secret set --vault-name "$kv_name" --name "datalakeContainerName" --value "$storage_file_system"
 az keyvault secret set --vault-name "$kv_name" --name "datalakeKey" --value "$azure_storage_key"
 az keyvault secret set --vault-name "$kv_name" --name "datalakeurl" --value "https://$azure_storage_account.dfs.core.windows.net"
 
 #########################
 # POWER-BI
+ 
+# Set PowerBI workspace name
+export pbi_ws_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-ws"
 
-pbi_ws_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-ws"
-pwsh -pbi {pbi_ws_name}
-.\powerbi\deploy_pbi_artifacts.ps1 -workspaceName ${pbi_ws_name} -userEmail ${PBI_DAP_USR_MAIL}
-bash
+# Create PowerBI workspace
+pwsh ./powerbi/deploy_pbi_artifacts.ps1 -kvName ${kv_name} -workspaceName ${pbi_ws_name} -userEmail ${PBI_DAP_USR_MAIL}
+
+# Retrieve PowerBI workspace id
+pbi_ws_id=$(az keyvault secret show --vault-name "$kv_name" --name "pbiwsid" --query value -o tsv)
 
 
 #########################
@@ -152,7 +157,7 @@ sql_server_name=$(echo "$arm_output" | jq -r '.properties.outputs.sql_server_nam
 sql_database_name=$(echo "$arm_output" | jq -r '.properties.outputs.sql_database_name.value')
 sql_admin_name=$(echo "$arm_output" | jq -r '.properties.outputs.sql_admin_name.value')
 
-# Synapse Sql Pool Connection String
+# Sql Pool Connection String
 sql_connstr_nocred=$(az sql db show-connection-string --client ado.net \
     --name "$sql_database_name" --server "$sql_server_name" --output json |
     jq -r .)
@@ -176,7 +181,7 @@ appinsights_key=$(az monitor app-insights component show \
     --output json |
     jq -r '.instrumentationKey')
 
-# Store in Keyvault
+# Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "applicationInsightsKey" --value "$appinsights_key"
 
 
@@ -196,7 +201,7 @@ loganalytics_key=$(az monitor log-analytics workspace get-shared-keys \
     --output json |
     jq -r '.primarySharedKey')
 
-# Store in Keyvault
+# Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "logAnalyticsId" --value "$loganalytics_id"
 az keyvault secret set --vault-name "$kv_name" --name "logAnalyticsKey" --value "$loganalytics_key"
 
@@ -222,6 +227,8 @@ sp_stor_out=$(az ad sp create-for-rbac \
 sp_stor_id=$(echo "$sp_stor_out" | jq -r '.appId')
 sp_stor_pass=$(echo "$sp_stor_out" | jq -r '.password')
 sp_stor_tenant=$(echo "$sp_stor_out" | jq -r '.tenant')
+
+# Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "spStorName" --value "$sp_stor_name"
 az keyvault secret set --vault-name "$kv_name" --name "spStorId" --value "$sp_stor_id"
 az keyvault secret set --vault-name "$kv_name" --name "spStorPass" --value "$sp_stor_pass"
@@ -237,7 +244,7 @@ databricks_token=$(DATABRICKS_TOKEN=$databricks_aad_token \
     DATABRICKS_HOST=$databricks_host \
     bash -c "databricks tokens create --comment 'deployment'" | jq -r .token_value)
 
-# Save in KeyVault
+# Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "databricksDomain" --value "$databricks_host"
 az keyvault secret set --vault-name "$kv_name" --name "databricksToken" --value "$databricks_token"
 az keyvault secret set --vault-name "$kv_name" --name "databricksWorkspaceResourceId" --value "$databricks_workspace_resource_id"
@@ -248,7 +255,7 @@ export DATABRICKS_AAD_TOKEN=$databricks_aad_token \
 DATABRICKS_HOST=$databricks_host \
 KEYVAULT_DNS_NAME=$kv_dns_name \
 KEYVAULT_RESOURCE_ID=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_resource_id.value') \
-    bash -c "./scripts/configure_databricks.sh"
+    bash -c "./scripts/deploy_dbricks_artifacts.sh"
 
 
 
@@ -262,6 +269,13 @@ synapse_dev_endpoint=$(az synapse workspace show \
     --resource-group "$resource_group_name" \
     --output json |
     jq -r '.connectivityEndpoints | .dev')
+
+synapse_sql_endpoint=$(az synapse workspace show \
+    --name "$synapseworkspace_name" \
+    --resource-group "$resource_group_name" \
+    --output json |
+    jq -r '.connectivityEndpoints | .sql')    
+
 
 synapse_sparkpool_name=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_output_spark_pool_name.value')
 synapse_sqlpool_name=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.synapse_pool_name')
@@ -283,9 +297,10 @@ synapse_sqlpool_connstr_uname=${synapse_sqlpool_connstr_nocred/<username>/$synap
 synapse_sqlpool_connstr_uname_pass=${synapse_sqlpool_connstr_uname/<password>/$SYNAPSE_SQL_PASSWORD}
 
 
-# Store in Keyvault
+# Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "synapseWorkspaceName" --value "$synapseworkspace_name"
 az keyvault secret set --vault-name "$kv_name" --name "synapseDevEndpoint" --value "$synapse_dev_endpoint"
+az keyvault secret set --vault-name "$kv_name" --name "synapseSqlEndpoint" --value "$synapse_sql_endpoint"
 az keyvault secret set --vault-name "$kv_name" --name "synapseSparkPoolName" --value "$synapse_sparkpool_name"
 az keyvault secret set --vault-name "$kv_name" --name "synapseSqlPoolServer" --value "$synapse_sqlpool_server"
 az keyvault secret set --vault-name "$kv_name" --name "synapseSQLPoolAdminUsername" --value "$synapse_sqlpool_admin_username"
@@ -306,7 +321,7 @@ jq --arg datalakeUrl "https://$azure_storage_account.dfs.core.windows.net" '.pro
 jq --arg databricksWorkspaceUrl "$databricks_host" '.properties.typeProperties.domain = $databricksWorkspaceUrl' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
 jq --arg databricks_workspace_resource_id "$databricks_workspace_resource_id" '.properties.typeProperties.workspaceResourceId = $databricks_workspace_resource_id' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
 jq --arg pbitenantid "${PBI_TENANT_ID}" '.properties.typeProperties.tenantID = $pbitenantid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
-jq --arg pbiworkspaceid "${PBI_WS_ID}" '.properties.typeProperties.workspaceID = $pbiworkspaceid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
+jq --arg pbiworkspaceid "${pbi_ws_id}" '.properties.typeProperties.workspaceID = $pbiworkspaceid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
 
 synScriptsDir=$synTempDir/workspace/scripts
 sed "s/<purview_name>/$purview_name/" \
@@ -339,7 +354,7 @@ AZURE_STORAGE_ACCOUNT=$azure_storage_account \
  sp_synapse_pass=$(echo "$sp_synapse_out" | jq -r '.password')
  sp_synapse_tenant=$(echo "$sp_synapse_out" | jq -r '.tenant')
 
-# Save Synapse SP credentials in Keyvault
+# Set Keyvault secrets
  az keyvault secret set --vault-name "$kv_name" --name "spSynapseName" --value "$sp_synapse_name"
  az keyvault secret set --vault-name "$kv_name" --name "spSynapseId" --value "$sp_synapse_id"
  az keyvault secret set --vault-name "$kv_name" --name "spSynapsePass" --value "$sp_synapse_pass"
@@ -390,50 +405,11 @@ sp_adf_id=$(echo "$sp_adf_out" | jq -r '.appId')
 sp_adf_pass=$(echo "$sp_adf_out" | jq -r '.password')
 sp_adf_tenant=$(echo "$sp_adf_out" | jq -r '.tenant')
 
-# Save ADF SP credentials in Keyvault
+# Set Keyvault secrets
 az keyvault secret set --vault-name "$kv_name" --name "spAdfName" --value "$sp_adf_name"
 az keyvault secret set --vault-name "$kv_name" --name "spAdfId" --value "$sp_adf_id"
 az keyvault secret set --vault-name "$kv_name" --name "spAdfPass" --value "$sp_adf_pass"
 az keyvault secret set --vault-name "$kv_name" --name "spAdfTenantId" --value "$sp_adf_tenant"
-
-
-
-
-
-
-####################
-## AZDO Azure Service Connection and Variables Groups
-
-## AzDO Azure Service Connections
-#PROJECT=$PROJECT \
-#ENV_NAME=$ENV_NAME \
-#RESOURCE_GROUP_NAME=$resource_group_name \
-#DEPLOYMENT_ID=$DEPLOYMENT_ID \
-#SYNAPSE_WORKSPACE_NAME=$synapseworkspace_name \
-#    bash -c "./scripts/deploy_azdo_service_connections_azure.sh"
-
-## AzDO Variable Groups
-
-#SP_SYNAPSE_ID=$sp_synapse_id \
-#SP_SYNAPSE_PASS=$sp_synapse_pass \
-##SP_SYNAPSE_TENANT=$sp_synapse_tenant \
-#PROJECT=$PROJECT \
-#ENV_NAME=$ENV_NAME \
-#AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
-#RESOURCE_GROUP_NAME=$resource_group_name \
-#AZURE_LOCATION=$AZURE_LOCATION \
-#KV_URL=$kv_dns_name \
-#AZURE_STORAGE_KEY=$azure_storage_key \
-#AZURE_STORAGE_ACCOUNT=$azure_storage_account \
-#SYNAPSE_WORKSPACE_NAME=$synapseworkspace_name \
-#BIG_DATAPOOL_NAME=$synapse_sparkpool_name \
-#SYNAPSE_SQLPOOL_SERVER=$synapse_sqlpool_server \
-#SYNAPSE_SQLPOOL_ADMIN_USERNAME=$synapse_sqlpool_admin_username \
-#SYNAPSE_SQLPOOL_ADMIN_PASSWORD=$SYNAPSE_SQL_PASSWORD \
-#SYNAPSE_DEDICATED_SQLPOOL_DATABASE_NAME=$synapse_dedicated_sqlpool_db_name \
-#LOG_ANALYTICS_WS_ID=$loganalytics_id \
-#LOG_ANALYTICS_WS_KEY=$loganalytics_key \
-#    bash -c "./scripts/deploy_azdo_variables.sh"
 
 
 ####################
