@@ -252,7 +252,7 @@ do
     echo "$provision_state: checking again in 10 seconds..."
 done
 
-
+echo "Start deploying Synapse artifacts - Platform Layer"
  
 # Deploy all Integration Runtimes
 createIntegrationRuntime "Lsshir01"
@@ -289,4 +289,4 @@ createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb"
 # Deploy SQL Scripts
 UploadSql "create_purview_user"
 
-echo "Completed deploying Synapse artifacts."
+echo "Completed deploying Synapse artifacts - Platform Layer"

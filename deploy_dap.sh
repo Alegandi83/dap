@@ -6,6 +6,8 @@ set -o nounset
 
 echo Start dap deploy
  
+export resource_group_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-rg"
+
 # PLATFORM LAYER ---------------------------------------------------------------
 
 # Deploy Platform Layer - Azure

@@ -141,7 +141,7 @@ uploadSynapseArtifactsToSparkPool(){
     #Update the Spark Pool with requirements.txt and sparkconfiguration
     #az synapse spark pool wait --resource-group "${RESOURCE_GROUP_NAME}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --big-data-pool-name "${BIG_DATAPOOL_NAME}" --created
     az rest --method put --headers "Content-Type=application/json" --url "${managementApiUri}" --body "$json_body"
-}
+} 
 
 createIntegrationRuntime () {
     declare name=$1
@@ -152,6 +152,10 @@ getIntegrationRuntimeConnectionInfo () {
     declare name=$1
     echo "Get Synapse IntegrationRuntime Connection Info: $name"
     az synapse integration-runtime get-connection-info --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --name ${name} --resource-group "${RESOURCE_GROUP_NAME}"
+}
+listAuthKeys () {
+    declare name=$1
+    az synapse integration-runtime list-auth-key --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --name ${name} --resource-group "${RESOURCE_GROUP_NAME}"    
 }
 createLinkedService () {
     declare name=$1
@@ -250,43 +254,8 @@ done
 
 
  
-# Deploy all Integration Runtimes
-createIntegrationRuntime "Lsshir01"
-#getIntegrationRuntimeConnectionInfo "Lsshir01"
-
-# Deploy all Linked Services
-createLinkedService "Ls_KeyVault_01"
-createLinkedService "Ls_AdlsGen2_01"
-createLinkedService "Ls_SqlDb_01"
-createLinkedService "Ls_AzureDatabricks_01"
-createLinkedService "Ls_Onprem_SQLServer"
-
-# Deploy all Datasets
-createDataset "AzureDLStorage_GetMetadataDataset"
-createDataset "AzureDLStorage_input_csv"       
-createDataset "AzureDLStorage_input_parquet"
-createDataset "AzureDLStorage"     
-createDataset "AzureSqlDatabaseExternal_ControlTable"
-createDataset "AzureSqlDatabaseTable"
-createDataset "AzureSynapseAnalyticsTable"
-createDataset "SqlServer_onPremise"      
-createDataset "SqlServer_onPremise_ControlTable"
-                 
-# Deploy all Pipelines
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool_parquet" 
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool"         
-createPipeline "BulkCopyfrom_AzureSQLdb_to_AzureDLStorage"                   
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool"
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"  
-createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
-createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb" 
-
-# Deploy SQL Scripts
-UploadSql "create_purview_user"
-
-
 # Start Deploy Use Case - Parking Sensor ------------------------------------------
-
+echo "Start deploying Synapse artifacts - Parking Sensor"
 
 # Build requirement.txt string to upload in the Spark Configuration
 configurationList=""
@@ -334,5 +303,6 @@ UpdateExternalTableScript
 # TODO: will replace and run this sql in deploying
 UploadSql "create_db_user_template"
 UploadSql "create_external_table"
-echo "Completed deploying Synapse artifacts."
+
+echo "Completed deploying Synapse artifacts - Parking Sensor"
 # End Deploy Use Case - Parking Sensor ------------------------------------------

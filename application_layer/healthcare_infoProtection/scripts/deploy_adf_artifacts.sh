@@ -87,40 +87,13 @@ createTrigger () {
     az rest --method put --uri "$adfTUrl" --body @"${ADF_DIR}"/trigger/"${name}".json
 }
 
-echo "Deploying Data Factory artifacts."
+# Start Deploy Use Case - Healthcare information Protection ------------------------------------------
+echo "Start deploying Data Factory artifacts - Healthcare information Protection"
 
-# Deploy all Integration Runtimes
-createIntegrationRuntime "Lsshir01"
-Lsshir01Key=$(listAuthKeys "Lsshir01" | jq -r '.authKey1')
-
-# Deploy all Linked Services
-createLinkedService "Ls_KeyVault_01"
-createLinkedService "Ls_AdlsGen2_01"
-createLinkedService "Ls_SqlDb_01"
-createLinkedService "Ls_AzureSQLDW_01"
-createLinkedService "Ls_AzureDatabricks_01"
-createLinkedService "Ls_Onprem_SQLServer"
-
-# Deploy all Datasets
-createDataset "AzureDLStorage_GetMetadataDataset"
-createDataset "AzureDLStorage_input_csv"       
-createDataset "AzureDLStorage_input_parquet"
-createDataset "AzureDLStorage"     
-createDataset "AzureSqlDatabaseExternal_ControlTable"
-createDataset "AzureSqlDatabaseTable"
-createDataset "AzureSynapseAnalyticsTable"
-createDataset "SqlServer_onPremise"      
-createDataset "SqlServer_onPremise_ControlTable"
-                 
+               
 # Deploy all Pipelines
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool_parquet" 
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool"         
-createPipeline "BulkCopyfrom_AzureSQLdb_to_AzureDLStorage"                   
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool"
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"  
-createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
-createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb"                                                       
+createPipeline "loadData"                                                 
  
 
-
-echo "Completed deploying Data Factory artifacts."
+echo "Completed deploying Data Factory artifacts - Healthcare information Protection"
+# End Deploy Use Case - Healthcare information Protection ------------------------------------------

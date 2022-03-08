@@ -254,39 +254,51 @@ done
 
 
  
-# Deploy all Integration Runtimes
-createIntegrationRuntime "Lsshir01"
-Lsshir01Key=$(listAuthKeys "Lsshir01" | jq -r '.authKey1')
+echo "Completed deploying Synapse artifacts." 
 
-# Deploy all Linked Services
-createLinkedService "Ls_KeyVault_01"
-createLinkedService "Ls_AdlsGen2_01"
-createLinkedService "Ls_SqlDb_01"
-createLinkedService "Ls_AzureDatabricks_01"
-createLinkedService "Ls_PowerBI_01"
-createLinkedService "Ls_Onprem_SQLServer"
+# Start Deploy Use Case - Healthcare information Protection ------------------------------------------
+echo "Start deploying Synapse artifacts - Healthcare information Protection"
 
-# Deploy all Datasets
-createDataset "AzureDLStorage_GetMetadataDataset"
-createDataset "AzureDLStorage_input_csv"       
-createDataset "AzureDLStorage_input_parquet"
-createDataset "AzureDLStorage"     
-createDataset "AzureSqlDatabaseExternal_ControlTable"
-createDataset "AzureSqlDatabaseTable"
-createDataset "AzureSynapseAnalyticsTable"
-createDataset "SqlServer_onPremise"      
-createDataset "SqlServer_onPremise_ControlTable"
-                 
+
+# This line allows the spark pool to be available to attach to the notebooks
+az synapse spark session list --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
+createNotebook "Hpi Campaign Analytics DataPrep"
+
 # Deploy all Pipelines
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool_parquet" 
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool"         
-createPipeline "BulkCopyfrom_AzureSQLdb_to_AzureDLStorage"                   
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool"
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"  
-createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
-createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb" 
+createPipeline "loadData" 
+ 
 
 # Deploy SQL Scripts
+UploadSql "0 Set up Script RLS DDM"
+UploadSql "1 HealthCare SQL Pool Security DDM"
+UploadSql "2 HealthCare SQL Pool Security RLS"
+UploadSql "3 HealthCare SQL Pool Security CLS"
+UploadSql "CLS_ChiefOperatingManager"
+UploadSql "CLS_DAM_AC_New"
+UploadSql "CLS_DAM_F_New"
+UploadSql "Confirm_DDM"
 UploadSql "create_purview_user"
+UploadSql "createExternalTable_PatientInformation"
+UploadSql "createSchema_hpi"
+UploadSql "createTable_Campaign_Analytics_New"
+UploadSql "createTable_Campaign_Analytics"
+UploadSql "createTable_HealthCare-FactSales"
+UploadSql "createTable_HospitalEmpPIIData"
+UploadSql "createTable_Mkt_CampaignAnalyticLatest"
+UploadSql "createTable_PatientInformation"
+UploadSql "createTable_RoleNew"
+UploadSql "createUsers"
+UploadSql "loadTable_Campaign_Analytics_New"
+UploadSql "loadTable_Campaign_Analytics"
+UploadSql "loadTable_Healthcare-FactSales"
+UploadSql "loadTable_HospitalEmpPIIData"
+UploadSql "loadTable_Mkt_CampaignAnalyticLatest"
+UploadSql "loadTable_PatientInformation"
+UploadSql "loadTable_RoleNew"
+UploadSql "Sp_HealthCareRLS"
+UploadSql "SP_RLS_CareManagerLosAngeles"
+UploadSql "SP_RLS_CareManagerMiami"
+UploadSql "SP_RLS_ChiefOperatingManager"
 
-echo "Completed deploying Synapse artifacts."
+echo "Completed deploying Synapse artifacts - Healthcare information Protection"
+# End Deploy Use Case - Healthcare information Protection ------------------------------------------

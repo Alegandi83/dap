@@ -1,0 +1,56 @@
+{
+	"name": "loadData",
+	"properties": {
+		"activities": [
+			{
+				"name": "Ingest_SQLS_to_ADLS",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BulkCopyfrom_SQLServer_to_AzureDLStorage",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Control_Table_Name": "ControlTableForTemplate",
+						"Control_Table_Schema_PartitionID": "PartitionID",
+						"Control_Table_Schema_SourceTableName": "SourceTableName",
+						"Control_Table_Schema_FilterQuery": "FilterQuery",
+						"Data_Destination_Container": "prova",
+						"Data_Destination_Directory": "radice",
+						"Control_Table_Schema_SourceTableSchema": "SourceTableSchema"
+					}
+				}
+			},
+			{
+				"name": "Process_ADLS_to_Syn",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Ingest_SQLS_to_ADLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"SourceContainer": "hpi"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "healthcare_infoProtection"
+		},
+		"annotations": []
+	}
+}
