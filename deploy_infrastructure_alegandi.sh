@@ -3,12 +3,6 @@
 # DEPLOY ARM TEMPLATE
 
 
-# TODO install module inside devcontainer
-Install-Module -Name MicrosoftPowerBIMgmt
-
-az login                                    # Connect to Azure                                            
-Connect-PowerBIServiceAccount | Out-Null    # Connect to PowerBI
-
 export GITHUB_REPO=Alegandi83/modern-data-warehouse-dataops
 export GITHUB_PAT_TOKEN=null
 export AZURE_SUBSCRIPTION_ID=272f5f06-6693-48ae-975b-b5c7553539c2
@@ -35,23 +29,23 @@ export kv_dns_name=https://${kv_name}.vault.azure.net/
 
 $project = "ag83" 
 $env = "dev" 
-$deployment_id = "00004"
+$deployment_id = "00006"
 $tenant_id = "72f988bf-86f1-41af-91ab-2d7cd011db47"
 $subscriptionId = "/subscriptions/272f5f06-6693-48ae-975b-b5c7553539c2"
 $user_id = "20b8fb52-db34-40c0-858a-3024a4dc8bd5"
-$resourceGroupName = "ag83-00004-dev-rg"
+$resourceGroupName = "ag83-00006-dev-rg"
 $location = "westeurope"
-$purview_account = "ag83pviewdev00004"
-$vault_name = "ag83-kv-dev-00004"
-$vault_uri = "https://ag83-kv-dev-00004.vault.azure.net/"
-$sql_server_name = "ag83sqldev00004"
-$sql_db_name = "ag83sqldbdev00004"
+$purview_account = "ag83pviewdev00006"
+$vault_name = "ag83-kv-dev-00006"
+$vault_uri = "https://ag83-kv-dev-00006.vault.azure.net/"
+$sql_server_name = "ag83sqldev00006"
+$sql_db_name = "ag83sqldbdev00006"
 $admin_login = "sqladminuserag83"
 $sql_secret_name = "Sqladminpswag83!"
-$storage_account_name = "ag83stdev00004"
-$managed_identity = "73ec0606-8f2f-4df3-bbe3-3dbeba209408"
+$storage_account_name = "ag83stdev00006"
+$managed_identity = "bc3ce61c-9a05-4d49-ac4b-11c6c0fb53ff"
 $adf_principal_id = "a89db750-6be0-4a2e-80d3-c7b282699ad6"
-$syn_name = "sywsdev00004"
+$syn_name = "sywsdev00006"
 
 
 $scan_endpoint = "https://${purview_account}.scan.purview.azure.com"

@@ -4,9 +4,17 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-echo Start dap deploy
- 
+# Connect to Azure 
+echo "Connect to Azure"
+az login
+
+# Set Resource Group name 
+export ENV_NAME=dev
 export resource_group_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-rg"
+
+# Set account to where ARM template will be deployed to
+echo "Deploying to Subscription: $AZURE_SUBSCRIPTION_ID"
+az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
 # PLATFORM LAYER ---------------------------------------------------------------
 
