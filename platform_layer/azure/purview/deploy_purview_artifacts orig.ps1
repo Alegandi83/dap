@@ -396,10 +396,6 @@ Write-Host "--- Update Root Collection Policy ---"
 $collectionName = $purview_account
 $rootCollectionPolicy = getMetadataPolicy $token $collectionName
 $metadataPolicyId = $rootCollectionPolicy.id
-# addRoleAssignment $rootCollectionPolicy $user_id "collection-administrator"
-# addRoleAssignment $rootCollectionPolicy $user_id "purview-reader"
-# addRoleAssignment $rootCollectionPolicy $user_id "data-curator"
-# addRoleAssignment $rootCollectionPolicy $user_id "data-source-administrator"
 addRoleAssignment $rootCollectionPolicy $adf_principal_id "data-curator"
 addRoleAssignment $rootCollectionPolicy $syn_principal_id "data-curator"
 putMetadataPolicy $token $metadataPolicyId $rootCollectionPolicy

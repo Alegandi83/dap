@@ -359,5 +359,4 @@ while (-not $completed) {
     }
   }
 
-
 Write-Host "--- End Purview DataPlane Test ---"

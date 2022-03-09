@@ -44,7 +44,8 @@ $admin_login = "sqladminuserag83"
 $sql_secret_name = "Sqladminpswag83!"
 $storage_account_name = "ag83stdev00006"
 $managed_identity = "bc3ce61c-9a05-4d49-ac4b-11c6c0fb53ff"
-$adf_principal_id = "a89db750-6be0-4a2e-80d3-c7b282699ad6"
+$adf_principal_id = "7ea99b31-eb9c-45fd-95ad-b3c757eb5915"
+$adf_principal_id = "404471e7-f49d-44b7-9e45-0ffa0931971c"
 $syn_name = "sywsdev00006"
 
 
