@@ -24,7 +24,7 @@ param(
 )
 
 
-Write-Host "--- End Purview DataPlane Test ---"
+Write-Host "--- Start Purview DataPlane Test ---"
 whoami
 
 # Variables
