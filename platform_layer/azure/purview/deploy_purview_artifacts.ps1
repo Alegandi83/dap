@@ -20,8 +20,8 @@ param(
     [string]$syn_name,
     [string]$syn_principal_id,
 #    [string]$adf_pipeline_name,
-    [string]$managed_identity
-    [string]$pbi_tenant_id
+    [string]$managed_identity,
+    [string]$pbi_tenant_id,
     [string]$pbi_ws_name
 )
 

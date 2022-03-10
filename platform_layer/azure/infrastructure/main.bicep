@@ -13,6 +13,9 @@ param keyvault_owner_object_id string
 param synapse_sqlpool_admin_password string
 param sql_administrator_Password string
 
+param pbi_tenant_id string
+param pbi_ws_name string
+
 
 // User Identity
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
@@ -203,7 +206,7 @@ module RBACRoleAssignment 'modules/RBAC_deploy.bicep' = {
     userAssignedIdentity
     storage
     sql
-    databricks
+    databricksy
     synapse
     datafactory
     purview
@@ -231,7 +234,7 @@ resource script 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   kind: 'AzurePowerShell'
   properties: {
     azPowerShellVersion: '6.2'
-    arguments: '-project ${project} -env ${env} -deployment_id ${deployment_id} -tenant_id ${tenant_id} -subscriptionId ${subscription_id} -resourceGroupName ${rg_name} -location ${location} -user_id ${keyvault_owner_object_id} -purview_account ${purview.outputs.purview_name} -vault_uri ${keyvault.outputs.keyvault_resource_uri} -admin_login ${sql.outputs.sql_admin_name} -sql_secret_name ${sql_administrator_Password} -sql_server_name ${sql.outputs.sql_server_name} -sql_db_name ${sql.outputs.sql_database_name} -storage_account_name ${storage.outputs.storage_account_name} -adf_name ${datafactory.outputs.datafactory_name} -adf_principal_id ${datafactory.outputs.datafactory_principal_id} -syn_name ${synapse.outputs.synapseWorkspaceName} -syn_principal_id ${synapse.outputs.synapse_principal_id} -managed_identity ${userAssignedIdentity.properties.principalId}'
+    arguments: '-project ${project} -env ${env} -deployment_id ${deployment_id} -tenant_id ${tenant_id} -subscriptionId ${subscription_id} -resourceGroupName ${rg_name} -location ${location} -user_id ${keyvault_owner_object_id} -purview_account ${purview.outputs.purview_name} -vault_uri ${keyvault.outputs.keyvault_resource_uri} -admin_login ${sql.outputs.sql_admin_name} -sql_secret_name ${sql_administrator_Password} -sql_server_name ${sql.outputs.sql_server_name} -sql_db_name ${sql.outputs.sql_database_name} -storage_account_name ${storage.outputs.storage_account_name} -adf_name ${datafactory.outputs.datafactory_name} -adf_principal_id ${datafactory.outputs.datafactory_principal_id} -syn_name ${synapse.outputs.synapseWorkspaceName} -syn_principal_id ${synapse.outputs.synapse_principal_id} -managed_identity ${userAssignedIdentity.properties.principalId} -pbi_tenant_id ${pbi_tenant_id} -pbi_ws_name ${pbi_ws_name}'
     // scriptContent: loadTextContent('deploymentScript.ps1')
     primaryScriptUri: 'https://raw.githubusercontent.com/Alegandi83/dap/main/platform_layer/azure/purview/deploy_purview_artifacts.ps1'
     forceUpdateTag: guid(resourceGroup().id)
