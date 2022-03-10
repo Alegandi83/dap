@@ -47,7 +47,8 @@ $managed_identity = "bc3ce61c-9a05-4d49-ac4b-11c6c0fb53ff"
 $adf_principal_id = "7ea99b31-eb9c-45fd-95ad-b3c757eb5915"
 $adf_principal_id = "404471e7-f49d-44b7-9e45-0ffa0931971c"
 $syn_name = "sywsdev00006"
-
+$pbi_tenant_id = "0856a07c-daf4-44cf-acd9-12b9ba5ad6f0"
+$pbi_ws_name = "ag83-00006-dev-ws"
 
 $scan_endpoint = "https://${purview_account}.scan.purview.azure.com"
 $catalog_endpoint = "https://${purview_account}.catalog.purview.azure.com"

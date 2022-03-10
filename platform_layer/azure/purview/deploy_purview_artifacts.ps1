@@ -21,11 +21,9 @@ param(
     [string]$syn_principal_id,
 #    [string]$adf_pipeline_name,
     [string]$managed_identity
+    [string]$pbi_tenant_id
+    [string]$pbi_ws_name
 )
-
-
-Write-Host "--- Start Purview DataPlane Test ---"
-whoami
 
 # Variables
 $scan_endpoint = "https://${purview_account}.scan.purview.azure.com"
@@ -242,29 +240,18 @@ function addRoleAssignment([object]$policy, [string]$principalId, [string]$roleN
     }
 }
 
-# [PUT] Collection
-function putCollection([string]$token, [string]$collectionFriendlyName, [string]$parentCollection) {
-    $collectionName = -join ((97..122) | Get-Random -Count 6 | ForEach-Object {[char]$_})
-    $uri = "${pv_endpoint}/account/collections/${collectionName}?api-version=2019-11-01-preview"
-    $payload = @{
-        "name" = $collectionName
-        "parentCollection"= @{
-            "type" = "CollectionReference"
-            "referenceName" = $parentCollection
-        }
-        "friendlyName" = $collectionFriendlyName
-    }
+# [GET] DataSource 
+function getDataSource([string]$token, [string]$dsName) {
+    $uri = "${scan_endpoint}/datasources/${dsName}?api-version=2018-12-01-preview"
     $params = @{
         ContentType = "application/json"
         Headers = @{ Authorization = "Bearer $token" }
-        Body = ($payload | ConvertTo-Json -Depth 10)
-        Method = "PUT"
+        Method = "GET"
         URI = $uri
     }
     $response = Invoke-RestMethod @params
-    Return $response
+    return $response
 }
-
 
 #------------------------------------------------------------------------------------------------------------
 # ADD Managed Identity TO COLLECTION ADMINISTRATOR ROLE
@@ -359,4 +346,232 @@ while (-not $completed) {
     }
   }
 
-Write-Host "--- End Purview DataPlane Test ---"
+
+# Create a Key Vault Connection
+Write-Host "--- Create a Key Vault Connection ---"
+$vault_payload = @{
+    properties = @{
+        baseUrl = $vault_uri
+        description = ""
+    }
+}
+$vault = putVault $token $vault_name $vault_payload
+
+# Create SQL Credential
+Write-Host "--- Create SQL Credential ---"
+$credential_payload = @{
+    name = "sql-cred"
+    properties = @{
+        description = ""
+        type = "SqlAuth"
+        typeProperties = @{
+            password = @{
+                secretName = 'sqlConnectionString'
+                secretVersion = ""
+                store = @{
+                    referenceName = $vault.name
+                    type = "LinkedServiceReference"
+                }
+                type = "AzureKeyVaultSecret"
+            }
+            user = $admin_login
+        }
+    }
+    type = "Microsoft.Purview/accounts/credentials"
+}
+putCredential $token $credential_payload
+
+# Update Root Collection Policy (Add Current User to Built-In Purview Roles)
+Write-Host "--- Update Root Collection Policy ---"
+
+$collectionName = $purview_account
+$rootCollectionPolicy = getMetadataPolicy $token $collectionName
+$metadataPolicyId = $rootCollectionPolicy.id
+addRoleAssignment $rootCollectionPolicy $adf_principal_id "data-curator"
+addRoleAssignment $rootCollectionPolicy $syn_principal_id "data-curator"
+putMetadataPolicy $token $metadataPolicyId $rootCollectionPolicy
+
+# Create Collections
+Write-Host "--- Create Collections ---"
+$collectionSources = putCollection $token "Data Sources" $purview_account
+$collectionIngest = putCollection $token "Ingest" $purview_account
+$collectionAnalyze = putCollection $token "Analyze" $purview_account
+$collectionServe = putCollection $token "Serve" $purview_account
+
+$collectionSourcesName = $collectionSources.name
+$collectionIngestName = $collectionIngest.name
+$collectionAnalyzeName = $collectionAnalyze.name
+$collectionServeName = $collectionServe.name
+
+Start-Sleep 30
+
+
+# Create a Source (Azure SQL Database)
+Write-Host "--- Create a Source (Azure SQL Database) ---"
+
+$source_sqldb_payload = @{
+    id = "datasources/AzureSqlDatabase"
+    kind = "AzureSqlDatabase"
+    name = $sql_server_name
+    properties = @{
+        collection = @{
+            referenceName = $collectionSourcesName
+            type = 'CollectionReference'
+        }
+        location = $location
+        resourceGroup = $resource_group
+        resourceName = $sql_server_name
+        serverEndpoint = "${sql_server_name}.database.windows.net"
+        subscriptionId = $subscription_id
+    }
+}
+putSource $token $source_sqldb_payload
+
+# Create a Source (Azure Data Lake Storage)
+Write-Host "--- Create a Source (Azure Data Lake Storage) ---"
+
+$source_adls_payload = @{
+    id = "datasources/AzureDataLakeStorage"
+    kind = "AdlsGen2"
+    name = $storage_account_name
+    properties = @{
+        collection = @{
+            referenceName = $collectionIngestName
+            type = 'CollectionReference'
+        }
+        location = $location
+        endpoint = "https://${storage_account_name}.dfs.core.windows.net/"
+        resourceGroup = $resource_group
+        resourceName = $storage_account_name
+        subscriptionId = $subscription_id
+    }
+}
+putSource $token $source_adls_payload
+
+
+
+# Create a Source (Synapse Workspace)
+Write-Host "--- Create a Source (Synapse Workspace) ---"
+
+$source_syn_payload = @{
+    id = "datasources/AzureSynapseWorkspace"
+    kind = "AzureSynapseWorkspace"
+    name = $syn_name
+    properties = @{
+        collection = @{
+            referenceName = $collectionAnalyzeName
+            type = 'CollectionReference'
+        }
+        location = $location
+        dedicatedSqlEndpoint = "${syn_name}.sql.azuresynapse.net/"
+        serverlessSqlEndpoint = "${syn_name}-ondemand.sql.azuresynapse.net/"
+        resourceGroup = $resource_group
+        resourceName = $syn_name
+        subscriptionId = $subscription_id
+    }
+}
+putSource $token $source_syn_payload
+
+
+# Create a Source (PowerBI)
+Write-Host "--- Create a Source (PowerBI) ---"
+
+$source_pbi_payload = @{
+    id = "datasources/PowerBI"
+    kind = "PowerBI"
+    name = $pbi_ws_name
+    properties = @{
+        collection = @{
+            referenceName = $collectionServeName
+            type = 'CollectionReference'
+        }
+        tenant = $pbi_tenant_id   
+    }
+
+}
+putSource $token $source_pbi_payload
+
+
+<#
+# 7. Create a Scan Configuration
+$randomId = -join (((48..57)+(65..90)+(97..122)) * 80 |Get-Random -Count 3 |ForEach-Object{[char]$_})
+$scanName = "Scan-${randomId}"
+$scan_sqldb_payload = @{
+    kind = "AzureSqlDatabaseCredential"
+    name = $scanName
+    properties = @{
+        databaseName = $sql_db_name
+        scanRulesetName = "AzureSqlDatabase"
+        scanRulesetType = "System"
+        serverEndpoint = "${sql_server_name}.database.windows.net"
+        credential = @{
+            credentialType = "SqlAuth"
+            referenceName = $credential_payload.name
+        }
+        collection = @{
+            type = "CollectionReference"
+            referenceName = $collectionSalesName
+        }
+    }
+}
+putScan $token $source_sqldb_payload.name $scan_sqldb_payload
+
+# 8. Trigger Scan
+runScan $token $source_sqldb_payload.name $scan_sqldb_payload.name
+
+# 9. Load Storage Account with Sample Data
+$containerName = "bing"
+$storageAccount = Get-AzStorageAccount -ResourceGroupName $resource_group -Name $storage_account_name
+$RepoUrl = 'https://api.github.com/repos/microsoft/BingCoronavirusQuerySet/zipball/master'
+Invoke-RestMethod -Uri $RepoUrl -OutFile "${containerName}.zip"
+Expand-Archive -Path "${containerName}.zip"
+Set-Location -Path "${containerName}"
+Get-ChildItem -File -Recurse | Set-AzStorageBlobContent -Container ${containerName} -Context $storageAccount.Context
+
+# 10. Create a Source (ADLS Gen2)
+$source_adls_payload = @{
+    id = "datasources/AzureDataLakeStorage"
+    kind = "AdlsGen2"
+    name = "AzureDataLakeStorage"
+    properties = @{
+        collection = @{
+            referenceName = $collectionMarketingName
+            type = 'CollectionReference'
+        }
+        location = $location
+        endpoint = "https://${storage_account_name}.dfs.core.windows.net/"
+        resourceGroup = $resource_group
+        resourceName = $storage_account_name
+        subscriptionId = $subscription_id
+    }
+}
+putSource $token $source_adls_payload
+
+# 11. Create a Scan Configuration
+$randomId = -join (((48..57)+(65..90)+(97..122)) * 80 |Get-Random -Count 3 |ForEach-Object{[char]$_})
+$scanName = "Scan-${randomId}"
+$scan_adls_payload = @{
+    kind = "AdlsGen2Msi"
+    name = $scanName
+    properties = @{
+        scanRulesetName = "AdlsGen2"
+        scanRulesetType = "System"
+        collection = @{
+            type = "CollectionReference"
+            referenceName = $collectionMarketingName
+        }
+    }
+}
+putScan $token $source_adls_payload.name $scan_adls_payload
+
+# 12. Trigger Scan
+runScan $token $source_adls_payload.name $scan_adls_payload.name
+
+# 13. Run ADF Pipeline
+#Invoke-AzDataFactoryV2Pipeline -ResourceGroupName $resource_group -DataFactoryName $adf_name -PipelineName $adf_pipeline_name
+
+# 14. Populate Glossary
+$glossaryGuid = (createGlossary $token).guid
+$glossaryTermsTemplateUri = 'https://raw.githubusercontent.com/tayganr/purviewlab/main/assets/import-terms-sample.csv'
+importGlossaryTerms $token $glossaryGuid $glossaryTermsTemplateUri
+#>
