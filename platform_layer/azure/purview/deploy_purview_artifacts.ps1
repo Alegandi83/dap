@@ -240,6 +240,29 @@ function addRoleAssignment([object]$policy, [string]$principalId, [string]$roleN
     }
 }
 
+# [PUT] Collection
+function putCollection([string]$token, [string]$collectionFriendlyName, [string]$parentCollection) {
+    $collectionName = -join ((97..122) | Get-Random -Count 6 | ForEach-Object {[char]$_})
+    $uri = "${pv_endpoint}/account/collections/${collectionName}?api-version=2019-11-01-preview"
+    $payload = @{
+        "name" = $collectionName
+        "parentCollection"= @{
+            "type" = "CollectionReference"
+            "referenceName" = $parentCollection
+        }
+        "friendlyName" = $collectionFriendlyName
+    }
+    $params = @{
+        ContentType = "application/json"
+        Headers = @{ Authorization = "Bearer $token" }
+        Body = ($payload | ConvertTo-Json -Depth 10)
+        Method = "PUT"
+        URI = $uri
+    }
+    $response = Invoke-RestMethod @params
+    Return $response
+}
+
 # [GET] DataSource 
 function getDataSource([string]$token, [string]$dsName) {
     $uri = "${scan_endpoint}/datasources/${dsName}?api-version=2018-12-01-preview"
