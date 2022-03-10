@@ -19,6 +19,11 @@ export pbi_ws_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-ws"
 echo "Deploying to Subscription: $AZURE_SUBSCRIPTION_ID"
 az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
+# By default, set all KeyVault permission to deployer
+# Retrieve KeyVault User Id
+export kv_owner_object_id=$(az ad signed-in-user show --output json | jq -r '.objectId')
+
+
 # PLATFORM LAYER ---------------------------------------------------------------
 
 # Deploy Platform Layer - Azure

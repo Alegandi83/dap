@@ -212,7 +212,7 @@ sp_stor_name="${PROJECT}-stor-${ENV_NAME}-${DEPLOYMENT_ID}-sp"
 sp_stor_out=$(az ad sp create-for-rbac \
     --role "Storage Blob Data Contributor" \
     --scopes "$stor_id" \
-    --name "$sp_stor_name" \
+    --name "ag83-paperino" \
     --output json)
 
 # store storage service principal details in Keyvault
@@ -308,7 +308,7 @@ mkdir -p $synTempDir && cp -a synapse/ .tmp/
 
 tmpfile=.tmpfile
 synLsDir=$synTempDir/workspace/linkedService
-jq --arg kvurl "$kv_dns_name" '.properties.typeProperties.baseUrl = $kvurl' $adfLsDir/Ls_KeyVault_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_KeyVault_01.json
+jq --arg kvurl "$kv_dns_name" '.properties.typeProperties.baseUrl = $kvurl' $synLsDir/Ls_KeyVault_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_KeyVault_01.json
 jq --arg datalakeUrl "https://$azure_storage_account.dfs.core.windows.net" '.properties.typeProperties.url = $datalakeUrl' $synLsDir/Ls_AdlsGen2_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AdlsGen2_01.json
 jq --arg databricksWorkspaceUrl "$databricks_host" '.properties.typeProperties.domain = $databricksWorkspaceUrl' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
 jq --arg databricks_workspace_resource_id "$databricks_workspace_resource_id" '.properties.typeProperties.workspaceResourceId = $databricks_workspace_resource_id' $synLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_AzureDatabricks_01.json
