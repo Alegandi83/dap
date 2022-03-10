@@ -62,7 +62,7 @@ arm_output=$(az deployment group validate \
     --resource-group "$resource_group_name" \
     --template-file "./infrastructure/main.bicep" \
     --parameters @"./infrastructure/main.parameters.${ENV_NAME}.json" \
-    --parameters project="${PROJECT}" keyvault_owner_object_id="${kv_owner_object_id}" deployment_id="${DEPLOYMENT_ID}" synapse_sqlpool_admin_password="${SYNAPSE_SQL_PASSWORD}" sql_administrator_Password="${DB_SQL_PASSWORD}" \
+    --parameters project="${PROJECT}" keyvault_owner_object_id="${kv_owner_object_id}" deployment_id="${DEPLOYMENT_ID}" synapse_sqlpool_admin_password="${SYNAPSE_SQL_PASSWORD}" sql_administrator_Password="${DB_SQL_PASSWORD}" pbi_tenant_id="${PBI_TENANT_ID}" pbi_ws_name="${pbi_ws_name}"\
     --output json)
 
 # Deploy arm template
@@ -71,7 +71,7 @@ arm_output=$(az deployment group create \
     --resource-group "$resource_group_name" \
     --template-file "./infrastructure/main.bicep" \
     --parameters @"./infrastructure/main.parameters.${ENV_NAME}.json" \
-    --parameters project="${PROJECT}" deployment_id="${DEPLOYMENT_ID}" keyvault_owner_object_id="${kv_owner_object_id}" synapse_sqlpool_admin_password="${SYNAPSE_SQL_PASSWORD}" sql_administrator_Password="${DB_SQL_PASSWORD}" \
+    --parameters project="${PROJECT}" deployment_id="${DEPLOYMENT_ID}" keyvault_owner_object_id="${kv_owner_object_id}" synapse_sqlpool_admin_password="${SYNAPSE_SQL_PASSWORD}" sql_administrator_Password="${DB_SQL_PASSWORD}" pbi_tenant_id="${PBI_TENANT_ID}" pbi_ws_name="${pbi_ws_name}"\
     --output json)
 
 if [[ -z $arm_output ]]; then
@@ -124,9 +124,6 @@ az keyvault secret set --vault-name "$kv_name" --name "datalakeurl" --value "htt
 #########################
 # POWER-BI
  
-# Set PowerBI workspace name
-export pbi_ws_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-ws"
-
 # Create PowerBI workspace
 pwsh ./powerbi/deploy_pbi_artifacts.ps1 -kvName ${kv_name} -workspaceName ${pbi_ws_name} -userEmail ${PBI_DAP_USR_MAIL}
 
