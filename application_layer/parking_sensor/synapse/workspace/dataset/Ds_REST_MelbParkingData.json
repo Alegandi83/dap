@@ -10,6 +10,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "parking_sensor"
+		  },		
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {

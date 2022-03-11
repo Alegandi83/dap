@@ -66,6 +66,8 @@ export kv_name=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_name.v
 
 
 
+
+
 # BUILD ENV FILE FROM CONFIG INFORMATION
 env_file=".env.${ENV_NAME}"
 echo "Appending configuration to .env file."

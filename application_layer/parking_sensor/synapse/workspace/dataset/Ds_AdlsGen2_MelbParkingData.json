@@ -17,6 +17,9 @@
 				"defaultValue": "datalake/data/lnd"
 			}
 		},
+		"folder": {
+			"name": "parking_sensor"
+		  },		
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {

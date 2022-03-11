@@ -260,7 +260,7 @@
         },
         "userProperties": [],
         "sqlPool": {
-          "referenceName": "syndpdev00006",
+          "referenceName": "syndpdev00008",
           "type": "SqlPoolReference"
         },
         "typeProperties": {
@@ -282,6 +282,9 @@
         "type": "String",
         "defaultValue": "Ind"
       }
+    },
+    "folder": {
+      "name": "parking_sensor"
     },
     "annotations": [],
     "lastPublishTime": "2021-10-26T23:43:06Z"

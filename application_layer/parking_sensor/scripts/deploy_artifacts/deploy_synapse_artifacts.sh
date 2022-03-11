@@ -29,20 +29,27 @@ set -o pipefail
 set -o nounset
 # set -o xtrace # For debugging
 
-###################
-# REQUIRED ENV VARIABLES:
-#
-# AZURE_SUBSCRIPTION_ID
-# RESOURCE_GROUP_NAME
-# SYNAPSE_WORKSPACE_NAME
-# SYNAPSE_DEV_ENDPOINT
-# BIG_DATAPOOL_NAME
-# LOG_ANALYTICS_WS_ID
-# LOG_ANALYTICS_WS_KEY
-# KEYVAULT_NAME
-# AZURE_STORAGE_ACCOUNT
- 
+
+# Retrieve info from KeyVault
+echo "Retrieve info from KeyVault"
+RESOURCE_GROUP_NAME=$resource_group_name
+SYNAPSE_WORKSPACE_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "synapseWorkspaceName" --query value -o tsv)
+SYNAPSE_DEV_ENDPOINT=$(az keyvault secret show --vault-name "$kv_name" --name "synapseDevEndpoint" --query value -o tsv)
+BIG_DATAPOOL_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSparkPoolName" --query value -o tsv)
+SQL_POOL_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSqlPoolName" --query value -o tsv)
+LOG_ANALYTICS_WS_ID=$(az keyvault secret show --vault-name "$kv_name" --name "logAnalyticsId" --query value -o tsv)
+LOG_ANALYTICS_WS_KEY=$(az keyvault secret show --vault-name "$kv_name" --name "logAnalyticsKey" --query value -o tsv)
+AZURE_STORAGE_ACCOUNT=$(az keyvault secret show --vault-name "$kv_name" --name "datalakeAccountName" --query value -o tsv)
+syn_sql_usr=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSQLPoolAdminUsername" --query value -o tsv)
+syn_sql_psw=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSQLPoolAdminPassword" --query value -o tsv)
+syn_db_name=$(az keyvault secret show --vault-name "$kv_name" --name "synapseDedicatedSQLPoolDBName" --query value -o tsv)
+syn_sql_endpoint=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSqlEndpoint" --query value -o tsv)
+datalakeAccountKey=$(az keyvault secret show --vault-name "$kv_name" --name "datalakeKey" --query value -o tsv)
+ADLSLocation="abfss://datalake@${AZURE_STORAGE_ACCOUNT}.dfs.core.windows.net"
+
+
 # Consts
+echo "Set Variables"
 apiVersion="2020-12-01&force=true"
 dataPlaneApiVersion="2019-06-01-preview"
 synapseResource="https://dev.azuresynapse.net"
@@ -165,7 +172,7 @@ createLinkedService () {
 createDataset () {
     declare name=$1
     echo "Creating Synapse Dataset: $name"
-    az synapse dataset create --file @./synapse/workspace/dataset/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse dataset create --file @./.tmp/synapse/workspace/dataset/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 createNotebook() {
     declare name=$1
@@ -173,7 +180,7 @@ createNotebook() {
     # Thus, we are resorting to deploying notebooks in .ipynb format.
     # See here: https://github.com/Azure/azure-cli/issues/20037
     echo "Creating Synapse Notebook: $name"
-    az synapse notebook create --file @./synapse/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
+    az synapse notebook create --file @./.tmp/synapse/workspace/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
 }
 createPipeline () {
     declare name=$1
@@ -183,12 +190,12 @@ createPipeline () {
     tmp=$(mktemp)
     jq --arg a "${SQL_POOL_NAME}" '.properties.activities[5].sqlPool.referenceName = $a' ./synapse/workspace/pipeline/"${name}".json > "$tmp" && mv "$tmp" ./synapse/workspace/pipeline/"${name}".json
     # Deploy the pipeline
-    az synapse pipeline create --file @./synapse/workspace/pipeline/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse pipeline create --file @./.tmp/synapse/workspace/pipeline/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 createTrigger () {
     declare name=$1
     echo "Creating Synapse Trigger: $name"
-    az synapse trigger create --file @./synapse/workspace/trigger/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse trigger create --file @./.tmp/synapse/workspace/trigger/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 
 
@@ -254,51 +261,79 @@ done
 
 
  
-echo "Completed deploying Synapse artifacts." 
+# Start Deploy Use Case - Parking Sensor ------------------------------------------
+echo "Start deploying Synapse artifacts - Parking Sensor"
 
-# Start Deploy Use Case - Healthcare information Protection ------------------------------------------
-echo "Start deploying Synapse artifacts - Healthcare information Protection"
+# Update Synapse LinkedServices to point to newly Databricks workspace URL
+echo "Create temp dir"
+synTempDir=.tmp/synapse
+mkdir -p $synTempDir && cp -a synapse/ .tmp/
+
+tmpfile=.tmpfile
+synLsDir=$synTempDir/workspace
+
+echo "Update References"
+jq --arg syn_db_name "$syn_db_name" '.properties.activities[5].sqlPool.referenceName = $syn_db_name' $synLsDir/pipeline/P_Ingest_MelbParkingData.json > "$tmpfile" && mv "$tmpfile" $synLsDir/pipeline/P_Ingest_MelbParkingData.json
+
+# Deploy DACPAC on Synapse
+# https://docs.microsoft.com/it-it/sql/tools/sqlpackage/sqlpackage-publish?view=sql-server-ver15
+echo "Publish DACPAC"
+sqlpackage /Action:Publish /SourceFile:"./sql/ddo_azuresqldw_dw/ddo_azuresqldw_dw/bin/Debug/ddo_azuresqldw_dw.dacpac" /TargetDatabaseName:${syn_db_name} /TargetServerName:${syn_sql_endpoint} /TargetUser:${syn_sql_usr} /TargetPassword:${syn_sql_psw} /Variables:ADLSCredentialKey=${datalakeAccountKey} /Variables:ADLSLocation=${ADLSLocation}
+
+
+# Build requirement.txt string to upload in the Spark Configuration
+echo "Build requirement.txt"
+configurationList=""
+while read -r p; do 
+    line=$(echo "$p" | tr -d '\r' | tr -d '\n')
+    if [ "$configurationList" != "" ]; then configurationList="$configurationList$line\r\n" ; else configurationList="$line\r\n"; fi
+done < $requirementsFileName
+
+# Build packages list to upload in the Spark Pool, upload packages to synapse workspace
+echo "Build packages list"
+libraryList=""
+for file in "$packagesDirectory"*.whl; do
+    filename=${file##*/}
+    librariesToUpload="{
+        \"name\": \"${filename}\",
+        \"path\": \"${SYNAPSE_WORKSPACE_NAME}/libraries/${filename}\",
+        \"containerName\": \"prep\",
+        \"type\": \"whl\"
+    }"
+    if [ "$libraryList" != "" ]; then libraryList=${libraryList}","${librariesToUpload}; else libraryList=${librariesToUpload};fi
+    uploadSynapsePackagesToWorkspace "${filename}"
+done
+customlibraryList="customLibraries:[$libraryList],"
+uploadSynapseArtifactsToSparkPool "${configurationList}" "${customlibraryList}"
 
 
 # This line allows the spark pool to be available to attach to the notebooks
+echo "Deploy Notebook"
 az synapse spark session list --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
-createNotebook "Hpi Campaign Analytics DataPrep"
+createNotebook "00_setup"
+createNotebook "01a_explore"
+createNotebook "01b_explore_sqlserverless"
+createNotebook "02_standardize"
+createNotebook "03_transform"
 
-# Deploy all Pipelines
-createPipeline "loadData" 
- 
+# Pipeline and Datasets
+echo "Deploy Pipelines"
+createLinkedService "Ls_Rest_MelParkSensors_01"
 
-# Deploy SQL Scripts
-UploadSql "0 Set up Script RLS DDM"
-UploadSql "1 HealthCare SQL Pool Security DDM"
-UploadSql "2 HealthCare SQL Pool Security RLS"
-UploadSql "3 HealthCare SQL Pool Security CLS"
-UploadSql "CLS_ChiefOperatingManager"
-UploadSql "CLS_DAM_AC_New"
-UploadSql "CLS_DAM_F_New"
-UploadSql "Confirm_DDM"
-UploadSql "create_purview_user"
-UploadSql "createExternalTable_PatientInformation"
-UploadSql "createSchema_hpi"
-UploadSql "createTable_Campaign_Analytics_New"
-UploadSql "createTable_Campaign_Analytics"
-UploadSql "createTable_HealthCare-FactSales"
-UploadSql "createTable_HospitalEmpPIIData"
-UploadSql "createTable_Mkt_CampaignAnalyticLatest"
-UploadSql "createTable_PatientInformation"
-UploadSql "createTable_RoleNew"
-UploadSql "createUsers"
-UploadSql "loadTable_Campaign_Analytics_New"
-UploadSql "loadTable_Campaign_Analytics"
-UploadSql "loadTable_Healthcare-FactSales"
-UploadSql "loadTable_HospitalEmpPIIData"
-UploadSql "loadTable_Mkt_CampaignAnalyticLatest"
-UploadSql "loadTable_PatientInformation"
-UploadSql "loadTable_RoleNew"
-UploadSql "Sp_HealthCareRLS"
-UploadSql "SP_RLS_CareManagerLosAngeles"
-UploadSql "SP_RLS_CareManagerMiami"
-UploadSql "SP_RLS_ChiefOperatingManager"
+echo "Deploy Datasets"
+createDataset "Ds_AdlsGen2_MelbParkingData"
+createDataset "Ds_REST_MelbParkingData"
+createPipeline "P_Ingest_MelbParkingData"
+createTrigger "T_Sched"
 
-echo "Completed deploying Synapse artifacts - Healthcare information Protection"
-# End Deploy Use Case - Healthcare information Protection ------------------------------------------
+# Upload SQL script
+echo "Deploy SQL Scripts"
+UpdateExternalTableScript
+# Upload create_db_user_template for now. 
+# TODO: will replace and run this sql in deploying
+# TODO: will replace and run this sql in deploying
+UploadSql "create_db_user_template"
+UploadSql "create_external_table"
+
+echo "Completed deploying Synapse artifacts - Parking Sensor"
+# End Deploy Use Case - Parking Sensor ------------------------------------------

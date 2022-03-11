@@ -2,6 +2,7 @@ param project string
 param env string
 param location string = resourceGroup().location
 param deployment_id string
+param keyvault_owner_object_id string
 
 
 param userAssignedIdentity_name string = '${project}-deploy-${env}-${deployment_id}-sp'
@@ -84,6 +85,7 @@ resource amlContainerRegistry 'Microsoft.ContainerRegistry/registries@2021-08-01
 }
 
 
+
 // User Assigned Identity (configDeployer) as Contributor on resource group
 resource userRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
   name: guid(userAssignedIdentity.name, resourceGroup().id)
@@ -93,6 +95,30 @@ resource userRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-08-01-
     roleDefinitionId: owner
     principalType: 'ServicePrincipal'
   }
+}
+
+
+// keyvault_owner as data contributor on Synapse Storage Account
+resource roleAssignmentKvOwnerStorage1 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+  name: guid(keyvault_owner_object_id, synStorage.id)
+  properties: {
+    principalId: keyvault_owner_object_id
+    roleDefinitionId: storage_blob_data_contributor
+    principalType: 'User'
+  }
+  scope: synStorage
+}
+
+
+// keyvault_owner as data contributor on Data Lake
+resource roleAssignmentKvOwnerStorage2 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+  name: guid(keyvault_owner_object_id, mainStorage.id)
+  properties: {
+    principalId: keyvault_owner_object_id
+    roleDefinitionId: storage_blob_data_contributor
+    principalType: 'User'
+  }
+  scope: mainStorage
 }
 
 

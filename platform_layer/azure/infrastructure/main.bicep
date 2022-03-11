@@ -224,6 +224,7 @@ module RBACRoleAssignment 'modules/RBAC_deploy.bicep' = {
     project: project
     env: env
     deployment_id: deployment_id
+    keyvault_owner_object_id: keyvault_owner_object_id
   }
 }
 

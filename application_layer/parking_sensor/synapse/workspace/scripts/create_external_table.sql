@@ -35,7 +35,7 @@ GO
 -- Create External Data Source
 IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'INTERIM_Zone')
 	CREATE EXTERNAL DATA SOURCE INTERIM_Zone
-	WITH (  LOCATION   =  'https://ag83stdev00006.dfs.core.windows.net/datalake/data/interim/'
+	WITH (  LOCATION   =  'https://ag83stdev00008.dfs.core.windows.net/datalake/data/interim/'
     ,CREDENTIAL = WorkspaceIdentity )
 Go
 -- Create parking_bay View 

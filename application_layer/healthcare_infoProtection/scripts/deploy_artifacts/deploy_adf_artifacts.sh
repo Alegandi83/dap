@@ -30,13 +30,13 @@ set -o pipefail
 set -o nounset
 # set -o xtrace # For debugging
 
-###################
-# REQUIRED ENV VARIABLES:
-#
-# AZURE_SUBSCRIPTION_ID
-# RESOURCE_GROUP_NAME
-# DATAFACTORY_NAME
-# ADF_DIR
+
+# Retrieve info from KeyVault
+echo "Retrieve info from KeyVault"
+ADF_DIR=.tmp/adf
+RESOURCE_GROUP_NAME=$resource_group_name
+DATAFACTORY_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "adfName" --query value -o tsv)
+
 
 
 # Consts
@@ -55,6 +55,11 @@ getIntegrationRuntimeConnectionInfo () {
     declare name=$1
     echo "Get ADF IntegrationRuntime Connection Info: $name"
     adfLsUrl="${adfFactoryBaseUrl}/integrationRuntimes/${name}/getConnectionInfo?api-version=${apiVersion}"
+    az rest --method post --uri "$adfLsUrl"
+}
+listAuthKeys () {
+    declare name=$1
+    adfLsUrl="${adfFactoryBaseUrl}/integrationRuntimes/${name}/listAuthKeys?api-version=${apiVersion}"
     az rest --method post --uri "$adfLsUrl"
 }
 createLinkedService () {
@@ -84,44 +89,17 @@ createTrigger () {
 
 echo "Deploying Data Factory artifacts."
 
-# Deploy all Integration Runtimes
-createIntegrationRuntime "Shir-IntegrationRuntime-01"
-getIntegrationRuntimeConnectionInfo "Lsshir01"
+# Start Deploy Use Case - Healthcare information Protection ------------------------------------------
+echo "Start deploying Data Factory artifacts - Healthcare information Protection"
 
-# Deploy all Linked Services
-createLinkedService "Ls_KeyVault_01"
-createLinkedService "Ls_AdlsGen2_01"
-createLinkedService "Ls_SqlDb_01"
-createLinkedService "Ls_AzureSQLDW_01"
-createLinkedService "Ls_AzureDatabricks_01"
-createLinkedService "Ls_Onprem_SQLServer"
 
-# Deploy all Datasets
-createDataset "AzureDLStorage_GetMetadataDataset"
-createDataset "AzureDLStorage_input_csv"       
-createDataset "AzureDLStorage_input_parquet"
-createDataset "AzureDLStorage"     
-createDataset "AzureSqlDatabaseExternal_ControlTable"
-createDataset "AzureSqlDatabaseTable"
-createDataset "AzureSynapseAnalyticsTable"
-createDataset "SqlServer_onPremise"      
-createDataset "SqlServer_onPremise_ControlTable"
-                 
+echo "Create temp dir"               
+mkdir -p $adfTempDir && cp -a adf/ .tmp/
+
 # Deploy all Pipelines
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool_parquet" 
-createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool"         
-createPipeline "BulkCopyfrom_AzureSQLdb_to_AzureDLStorage"                   
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool"
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"  
-createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
-createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb"                                                       
+echo "Deploy Pipelines"
+createPipeline "loadData"                                                 
  
 
-# Deploy Use Case - Parking Sensor
-createLinkedService "Ls_Rest_MelParkSensors_01"
-createDataset "Ds_AdlsGen2_MelbParkingData"
-createDataset "Ds_REST_MelbParkingData"
-createPipeline "P_Ingest_MelbParkingData"
-createTrigger "T_Sched"
-
-echo "Completed deploying Data Factory artifacts."
+echo "Completed deploying Data Factory artifacts - Healthcare information Protection"
+# End Deploy Use Case - Healthcare information Protection ------------------------------------------
