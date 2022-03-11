@@ -98,7 +98,7 @@ resource userRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-08-01-
 
 // Synapse as data contributor on Synapse Storage Account
 resource roleAssignmentSynStorage1 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(resourceGroup().id, resourceId('Microsoft.Storage/storageAccounts', synStorage.name))
+  name: guid(synapseWorkspace.id, synStorage.id)
   properties: {
     principalId: synapseWorkspace.identity.principalId
     roleDefinitionId: storage_blob_data_contributor
@@ -107,9 +107,10 @@ resource roleAssignmentSynStorage1 'Microsoft.Authorization/roleAssignments@2020
   scope: synStorage
 }
 
+
 // Synapse as data contributor on Data Lake
 resource roleAssignmentSynStorage2 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(resourceGroup().id, resourceId('Microsoft.Storage/storageAccounts', mainStorage.name))
+  name: guid(synapseWorkspace.id, mainStorage.id)
   properties: {
     principalId: synapseWorkspace.identity.principalId
     roleDefinitionId: storage_blob_data_contributor
@@ -120,7 +121,7 @@ resource roleAssignmentSynStorage2 'Microsoft.Authorization/roleAssignments@2020
 
 // Synapse as contributor on Databricks
 resource databricks_roleassignment 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(synapseWorkspace.name, resourceId('Microsoft.Databricks/workspaces', dbricks.name))
+  name: guid(synapseWorkspace.id, dbricks.id)
   scope: dbricks
   properties: {
     roleDefinitionId: contributor
@@ -131,7 +132,7 @@ resource databricks_roleassignment 'Microsoft.Authorization/roleAssignments@2020
 
 // Data Factory as data contributor on Synapse Storage Account
 resource roleAssignmentAdfStorage1 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(datafactory.name, resourceId('Microsoft.Storage/storageAccounts', synStorage.name))
+  name: guid(datafactory.id, synStorage.id)
   properties: {
     principalId: datafactory.identity.principalId
     roleDefinitionId: storage_blob_data_contributor
@@ -142,7 +143,7 @@ resource roleAssignmentAdfStorage1 'Microsoft.Authorization/roleAssignments@2020
 
 // Data Factory as data contributor on Data Lake
 resource roleAssignmentAdfStorage2 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(datafactory.name, resourceId('Microsoft.Storage/storageAccounts', mainStorage.name))
+  name: guid(datafactory.id, mainStorage.id)
   properties: {
     principalId: datafactory.identity.principalId
     roleDefinitionId: storage_blob_data_contributor
@@ -153,7 +154,7 @@ resource roleAssignmentAdfStorage2 'Microsoft.Authorization/roleAssignments@2020
 
 // Data Factory as contributor on Databricks
 resource databricks_Adfroleassignment 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(datafactory.name, resourceId('Microsoft.Databricks/workspaces', dbricks.name))
+  name: guid(datafactory.id, dbricks.id)
   scope: dbricks
   properties: {
     roleDefinitionId: contributor
@@ -164,7 +165,7 @@ resource databricks_Adfroleassignment 'Microsoft.Authorization/roleAssignments@2
 
 // Purview as data contributor on Data Lake
 resource roleAssignmentPviewStorage2 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(pv.name, resourceId('Microsoft.Storage/storageAccounts', mainStorage.name))
+  name: guid(pv.id, mainStorage.id)
   properties: {
     principalId: pv.identity.principalId
     roleDefinitionId: storage_blob_data_contributor
@@ -176,7 +177,7 @@ resource roleAssignmentPviewStorage2 'Microsoft.Authorization/roleAssignments@20
 // Purview as Reader on Synapse Workspace
 // https://docs.microsoft.com/en-us/azure/purview/register-scan-synapse-workspace#authentication-for-enumerating-serverless-sql-database-resources
 resource roleAssignmentPviewSynWorkspace 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(pv.name, subscription().subscriptionId, resourceGroup().id)
+  name: guid(pv.id, synapseWorkspace.id)
   properties:{
     principalId: pv.identity.principalId
     roleDefinitionId: reader
@@ -189,7 +190,7 @@ resource roleAssignmentPviewSynWorkspace 'Microsoft.Authorization/roleAssignment
 // StreamAnalytics as EventHub Data Onwer on EventHub
 // https://docs.microsoft.com/en-us/azure/stream-analytics/event-hubs-managed-identity#grant-the-stream-analytics-job-permissionsto-access-the-event-hub
 resource roleAssignmentAsaEventHubNamespace 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(eventHubNamespace.name, streamAnalyticsJob.name)
+  name: guid(streamAnalyticsJob.id, eventHubNamespace.id)
   properties:{
     roleDefinitionId: azureEventHubsDataOwner
     principalId: streamAnalyticsJob.identity.principalId
@@ -203,7 +204,7 @@ resource roleAssignmentAsaEventHubNamespace 'Microsoft.Authorization/roleAssignm
 // EventHub as Data Contributor on  Data Lake
 //https://docs.microsoft.com/en-us/azure/stream-analytics/blob-output-managed-identity#grant-access-via-the-azure-portal
 resource roleAssignmentAsaSynWorkspace 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(eventHubNamespace.name, mainStorage.name)
+  name: guid(eventHubNamespace.id, mainStorage.id)
   properties:{
     principalId: eventHubNamespace.identity.principalId
     roleDefinitionId: storage_blob_data_contributor
@@ -215,7 +216,7 @@ resource roleAssignmentAsaSynWorkspace 'Microsoft.Authorization/roleAssignments@
 // Synapse as Data Owner on EventHub
 //https://docs.microsoft.com/en-us/azure/stream-analytics/blob-output-managed-identity#grant-access-via-the-azure-portal
 resource roleAssignmentSynEventHubNamespace 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(synapseWorkspace.name, eventHubNamespace.name)
+  name: guid(synapseWorkspace.id, eventHubNamespace.id)
   properties:{
     principalId: synapseWorkspace.identity.principalId
     roleDefinitionId: azureEventHubsDataOwner
@@ -228,7 +229,7 @@ resource roleAssignmentSynEventHubNamespace 'Microsoft.Authorization/roleAssignm
 // Synapse as Contributor on Azure ML workspace.
 //https://docs.microsoft.com/en-us/azure/synapse-analytics/machine-learning/quickstart-integrate-azure-machine-learning#give-msi-permission-to-the-azure-ml-workspace
 resource roleAssignmentSynAmlWorkspace 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(synapseWorkspace.name, amlWorkspace.name)
+  name: guid(synapseWorkspace.id, amlWorkspace.id)
   properties:{
     principalId: synapseWorkspace.identity.principalId
     roleDefinitionId: contributor
@@ -240,7 +241,7 @@ resource roleAssignmentSynAmlWorkspace 'Microsoft.Authorization/roleAssignments@
 // Azure ML Workspace as Data Contributor on Data Lake
 // https://docs.microsoft.com/en-us/azure/machine-learning/how-to-identity-based-data-access
 resource roleAssignmentAmlWorkspaceSynWorkspace 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(amlWorkspace.name, mainStorage.name)
+  name: guid(amlWorkspace.id, mainStorage.id)
   properties:{
     principalId: amlWorkspace.identity.principalId
     roleDefinitionId: storage_blob_data_contributor
@@ -248,4 +249,3 @@ resource roleAssignmentAmlWorkspaceSynWorkspace 'Microsoft.Authorization/roleAss
   }
   scope: mainStorage  
 }
-*/

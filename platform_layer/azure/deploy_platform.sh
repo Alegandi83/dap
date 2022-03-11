@@ -37,14 +37,15 @@ arm_out=$(az deployment group create \
     --parameters project="${PROJECT}" deployment_id="${DEPLOYMENT_ID}" keyvault_owner_object_id="${kv_owner_object_id}" synapse_sqlpool_admin_password="${SYNAPSE_SQL_PASSWORD}" sql_administrator_Password="${DB_SQL_PASSWORD}" pbi_tenant_id="${PBI_TENANT_ID}" pbi_ws_name="${pbi_ws_name}"\
     --output json)
 
-if [[ -z $arm_output ]]; then
+if [[ -z $arm_out ]]; then
     echo >&2 "ARM deployment failed."
     exit 1
 fi
 
+
 # Set global variable for next steps
-export arm_output=${arm_out}
 export kv_name=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_name.value')
+export arm_output=${arm_out}
 
 
 # Services Configuration

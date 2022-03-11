@@ -1,0 +1,15 @@
+{
+  "name": "Ls_AdlsGen2_01",
+  "type": "Microsoft.Synapse/workspaces/linkedservices",
+  "properties": {
+    "annotations": [],
+    "type": "AzureBlobFS",
+    "typeProperties": {
+      "url": "https://ag83stdev00006.dfs.core.windows.net"
+    },
+    "connectVia": {
+      "referenceName": "AutoResolveIntegrationRuntime",
+      "type": "IntegrationRuntimeReference"
+    }
+  }
+}

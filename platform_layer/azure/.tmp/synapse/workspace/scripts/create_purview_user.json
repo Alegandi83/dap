@@ -1,0 +1,5 @@
+CREATE USER [purview_deploy_00006] FROM EXTERNAL PROVIDER
+GO
+
+EXEC sp_addrolemember 'db_datareader', [purview_deploy_00006]
+GO

@@ -24,22 +24,32 @@ az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 export kv_owner_object_id=$(az ad signed-in-user show --output json | jq -r '.objectId')
 
 
-# PLATFORM LAYER ---------------------------------------------------------------
+# PLATFORM LAYER --------------------------------------------------------------- 
 
 # Deploy Platform Layer - Azure
-. ./platform_layer/azure/deploy_platform.sh
+pushd platform_layer/azure
+./deploy_platform.sh
+popd
 
 # Deploy Platform Layer - onPrem
-. ./platform_layer/onprem/deploy_platform.sh
+pushd platform_layer/onprem
+./deploy_platform.sh
+popd
 
 
 # APPLICATION LAYER ------------------------------------------------------------
 
 # Deploy Application Layer - Parking Sensor
-. ./application_layer/parking_sensor/deploy_application.sh
+pushd application_layer/parking_sensor
+. ./deploy_application.sh
+popd
 
 # Deploy Application Layer - Healthcare Information Protection
-. ./application_layer/healthcare_infoProtection/deploy_application.sh
+pushd application_layer/healthcare_infoProtection
+./deploy_application.sh
+popd
 
 # Deploy Application Layer - Temperature Events - TODO 
-#. ./application_layer/temperature_events/deploy_application.sh
+pushd application_layer/temperature_events
+#./deploy_application.sh
+popd

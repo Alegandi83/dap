@@ -178,6 +178,9 @@ module machineLearning './modules/aml_workspace.bicep' = {
     location: location
     deployment_id: deployment_id
   }
+  dependsOn:[
+    keyvault
+  ]  
 }
 
 
@@ -199,14 +202,13 @@ module aml_services './modules/aml_service_connections.bicep' = {
 //********************************************************
 // RBAC Role Assignments
 //********************************************************
-/*
 module RBACRoleAssignment 'modules/RBAC_deploy.bicep' = {
   name: 'RBACRoleAssignmentDeploy'
   dependsOn:[
     userAssignedIdentity
     storage
     sql
-    databricksy
+    databricks
     synapse
     datafactory
     purview
@@ -246,11 +248,11 @@ resource script 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
       '${userAssignedIdentity.id}': {}
     }
   }
-//  dependsOn: [
-//    RBACRoleAssignment
-//  ]
+  dependsOn: [
+    RBACRoleAssignment
+  ]
 }
-*/
+
 
 
 output storage_account_name string = storage.outputs.storage_account_name
