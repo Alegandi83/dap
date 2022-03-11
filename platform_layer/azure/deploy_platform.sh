@@ -44,8 +44,8 @@ fi
 
 
 # Set global variable for next steps
-export kv_name=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_name.value')
 export arm_output=${arm_out}
+export kv_name=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_name.value')
 
 
 # Services Configuration
@@ -60,7 +60,9 @@ export arm_output=${arm_out}
 ./scripts/config_services/config_synapse.sh
 ./scripts/config_services/config_datafactory.sh
 
-
+# Deploy Artifacts
+./scripts/deploy_artifacts/deploy_synapse_artifacts.sh
+./scripts/deploy_artifacts/deploy_adf_artifacts.sh
 
 
 

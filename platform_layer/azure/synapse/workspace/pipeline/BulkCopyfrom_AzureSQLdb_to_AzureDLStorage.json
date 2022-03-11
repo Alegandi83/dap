@@ -131,7 +131,7 @@
       null,
       {
         "sqlPool": {
-          "referenceName": "syndpdev00006"
+          "referenceName": "syndpdev00008"
         }
       }
     ],
@@ -171,5 +171,5 @@
     "annotations": [],
     "lastPublishTime": "2021-12-11T13:35:18Z"
   },
-  "type": "Microsoft.DataFactory/factories/pipelines"
+  "type": "Microsoft.Synapse/workspaces/pipelines"
 }

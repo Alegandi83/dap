@@ -29,20 +29,21 @@ set -o pipefail
 set -o nounset
 # set -o xtrace # For debugging
 
-###################
-# REQUIRED ENV VARIABLES:
-#
-# AZURE_SUBSCRIPTION_ID
-# RESOURCE_GROUP_NAME
-# SYNAPSE_WORKSPACE_NAME
-# SYNAPSE_DEV_ENDPOINT
-# BIG_DATAPOOL_NAME
-# LOG_ANALYTICS_WS_ID
-# LOG_ANALYTICS_WS_KEY
-# KEYVAULT_NAME
-# AZURE_STORAGE_ACCOUNT
- 
+
+# Retrieve info from KeyVault
+echo "Retrieve info from KeyVault"
+RESOURCE_GROUP_NAME=$resource_group_name
+SYNAPSE_WORKSPACE_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "synapseWorkspaceName" --query value -o tsv)
+SYNAPSE_DEV_ENDPOINT=$(az keyvault secret show --vault-name "$kv_name" --name "synapseDevEndpoint" --query value -o tsv)
+BIG_DATAPOOL_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSparkPoolName" --query value -o tsv)
+SQL_POOL_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSqlPoolName" --query value -o tsv)
+LOG_ANALYTICS_WS_ID=$(az keyvault secret show --vault-name "$kv_name" --name "logAnalyticsId" --query value -o tsv)
+LOG_ANALYTICS_WS_KEY=$(az keyvault secret show --vault-name "$kv_name" --name "logAnalyticsKey" --query value -o tsv)
+AZURE_STORAGE_ACCOUNT=$(az keyvault secret show --vault-name "$kv_name" --name "datalakeAccountName" --query value -o tsv)
+
+
 # Consts
+echo "Set Variables"
 apiVersion="2020-12-01&force=true"
 dataPlaneApiVersion="2019-06-01-preview"
 synapseResource="https://dev.azuresynapse.net"
@@ -165,7 +166,7 @@ createLinkedService () {
 createDataset () {
     declare name=$1
     echo "Creating Synapse Dataset: $name"
-    az synapse dataset create --file @./synapse/workspace/dataset/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse dataset create --file @./.tmp/synapse/workspace/dataset/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 createNotebook() {
     declare name=$1
@@ -173,7 +174,7 @@ createNotebook() {
     # Thus, we are resorting to deploying notebooks in .ipynb format.
     # See here: https://github.com/Azure/azure-cli/issues/20037
     echo "Creating Synapse Notebook: $name"
-    az synapse notebook create --file @./synapse/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
+    az synapse notebook create --file @./.tmp/synapse/workspace/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
 }
 createPipeline () {
     declare name=$1
@@ -183,12 +184,12 @@ createPipeline () {
     tmp=$(mktemp)
     jq --arg a "${SQL_POOL_NAME}" '.properties.activities[5].sqlPool.referenceName = $a' ./synapse/workspace/pipeline/"${name}".json > "$tmp" && mv "$tmp" ./synapse/workspace/pipeline/"${name}".json
     # Deploy the pipeline
-    az synapse pipeline create --file @./synapse/workspace/pipeline/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse pipeline create --file @./.tmp/synapse/workspace/pipeline/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 createTrigger () {
     declare name=$1
     echo "Creating Synapse Trigger: $name"
-    az synapse trigger create --file @./synapse/workspace/trigger/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse trigger create --file @./.tmp/synapse/workspace/trigger/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 
 
@@ -255,18 +256,22 @@ done
 echo "Start deploying Synapse artifacts - Platform Layer"
  
 # Deploy all Integration Runtimes
+echo "Deploy Integration Runtimes"
 createIntegrationRuntime "Lsshir01"
 Lsshir01Key=$(listAuthKeys "Lsshir01" | jq -r '.authKey1')
 
 # Deploy all Linked Services
+echo "Deploy Linked Services"
 createLinkedService "Ls_KeyVault_01"
 createLinkedService "Ls_AdlsGen2_01"
 createLinkedService "Ls_SqlDb_01"
+createLinkedService "Ls_AzureSQLDW_01"
 createLinkedService "Ls_AzureDatabricks_01"
 createLinkedService "Ls_PowerBI_01"
-createLinkedService "Ls_Onprem_SQLServer"
+#createLinkedService "Ls_Onprem_SQLServer"
 
 # Deploy all Datasets
+echo "Deploy Datasets"
 createDataset "AzureDLStorage_GetMetadataDataset"
 createDataset "AzureDLStorage_input_csv"       
 createDataset "AzureDLStorage_input_parquet"
@@ -274,19 +279,21 @@ createDataset "AzureDLStorage"
 createDataset "AzureSqlDatabaseExternal_ControlTable"
 createDataset "AzureSqlDatabaseTable"
 createDataset "AzureSynapseAnalyticsTable"
-createDataset "SqlServer_onPremise"      
-createDataset "SqlServer_onPremise_ControlTable"
+#createDataset "SqlServer_onPremise"      
+#createDataset "SqlServer_onPremise_ControlTable"
                  
 # Deploy all Pipelines
+echo "Deploy Pipelines"
 createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool_parquet" 
 createPipeline "BulkCopyfrom_AzureDLStorage_to_SynapseDedicatedPool"         
 createPipeline "BulkCopyfrom_AzureSQLdb_to_AzureDLStorage"                   
 createPipeline "BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool"
-createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"  
-createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
-createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb" 
+#createPipeline "BulkCopyfrom_AzureSQLdb_to_SQLServer"  
+#createPipeline "BulkCopyfrom_SQLServer_to_AzureDLStorage"              
+#createPipeline "BulkCopyfrom_SQLServer_to_AzureSQLdb" 
 
 # Deploy SQL Scripts
+echo "Deploy SQL Scripts"
 UploadSql "create_purview_user"
 
 echo "Completed deploying Synapse artifacts - Platform Layer"

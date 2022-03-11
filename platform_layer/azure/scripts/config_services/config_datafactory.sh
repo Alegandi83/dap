@@ -44,12 +44,3 @@ jq --arg kvurl "$kv_dns_name" '.properties.typeProperties.baseUrl = $kvurl' $adf
 jq --arg databricksWorkspaceUrl "$databricks_host" '.properties.typeProperties.domain = $databricksWorkspaceUrl' $adfLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $adfLsDir/Ls_AzureDatabricks_01.json
 jq --arg databricks_workspace_resource_id "$databricks_workspace_resource_id" '.properties.typeProperties.workspaceResourceId = $databricks_workspace_resource_id' $adfLsDir/Ls_AzureDatabricks_01.json > "$tmpfile" && mv "$tmpfile" $adfLsDir/Ls_AzureDatabricks_01.json
 jq --arg datalakeUrl "https://$azure_storage_account.dfs.core.windows.net" '.properties.typeProperties.url = $datalakeUrl' $adfLsDir/Ls_AdlsGen2_01.json > "$tmpfile" && mv "$tmpfile" $adfLsDir/Ls_AdlsGen2_01.json
-
-
-# Deploy ADF artifacts
-#AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
-#RESOURCE_GROUP_NAME=$resource_group_name \
-#DATAFACTORY_NAME=$datafactory_name \
-#ADF_DIR=$adfTempDir \
-#    bash -c "./scripts/deploy_adf_artifacts.sh"
-

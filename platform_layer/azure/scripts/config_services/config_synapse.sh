@@ -51,6 +51,7 @@ synapse_sqlpool_connstr_uname_pass=${synapse_sqlpool_connstr_uname/<password>/$S
 az keyvault secret set --vault-name "$kv_name" --name "synapseWorkspaceName" --value "$synapseworkspace_name"
 az keyvault secret set --vault-name "$kv_name" --name "synapseDevEndpoint" --value "$synapse_dev_endpoint"
 az keyvault secret set --vault-name "$kv_name" --name "synapseSqlEndpoint" --value "$synapse_sql_endpoint"
+az keyvault secret set --vault-name "$kv_name" --name "synapseSqlPoolName" --value "$synapse_sqlpool_name"
 az keyvault secret set --vault-name "$kv_name" --name "synapseSparkPoolName" --value "$synapse_sparkpool_name"
 az keyvault secret set --vault-name "$kv_name" --name "synapseSqlPoolServer" --value "$synapse_sqlpool_server"
 az keyvault secret set --vault-name "$kv_name" --name "synapseSQLPoolAdminUsername" --value "$synapse_sqlpool_admin_username"
@@ -96,16 +97,3 @@ synScriptsDir=$synTempDir/workspace/scripts
 sed "s/<purview_name>/$purview_name/" \
 $synScriptsDir/create_purview_user.sql \
 > "$tmpfile" && mv "$tmpfile" $synScriptsDir/create_purview_user.json
-
-# Deploy Synapse artifacts
-#AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
-#RESOURCE_GROUP_NAME=$resource_group_name \
-#SYNAPSE_WORKSPACE_NAME=$synapseworkspace_name \
-#SYNAPSE_DEV_ENDPOINT=$synapse_dev_endpoint \
-#BIG_DATAPOOL_NAME=$synapse_sparkpool_name \
-#SQL_POOL_NAME=$synapse_sqlpool_name \
-#LOG_ANALYTICS_WS_ID=$loganalytics_id \
-#LOG_ANALYTICS_WS_KEY=$loganalytics_key \
-#KEYVAULT_NAME=$kv_name \
-#AZURE_STORAGE_ACCOUNT=$azure_storage_account \
-#    bash -c "./scripts/deploy_synapse_artifacts.sh"

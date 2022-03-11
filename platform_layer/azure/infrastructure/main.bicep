@@ -228,7 +228,7 @@ module RBACRoleAssignment 'modules/RBAC_deploy.bicep' = {
 }
 
 
-
+/*
 // Purview Data Plane Operations
 resource script 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'script'
@@ -252,7 +252,7 @@ resource script 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
     RBACRoleAssignment
   ]
 }
-
+*/
 
 
 output storage_account_name string = storage.outputs.storage_account_name

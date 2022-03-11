@@ -27,11 +27,13 @@ export kv_owner_object_id=$(az ad signed-in-user show --output json | jq -r '.ob
 # PLATFORM LAYER --------------------------------------------------------------- 
 
 # Deploy Platform Layer - Azure
+echo "Deploy Platform Layer - Azure"
 pushd platform_layer/azure
 ./deploy_platform.sh
 popd
 
 # Deploy Platform Layer - onPrem
+echo "Deploy Platform Layer - onPrem"
 pushd platform_layer/onprem
 ./deploy_platform.sh
 popd
@@ -40,16 +42,19 @@ popd
 # APPLICATION LAYER ------------------------------------------------------------
 
 # Deploy Application Layer - Parking Sensor
+echo "Deploy Application Layer - Parking Sensor"
 pushd application_layer/parking_sensor
 . ./deploy_application.sh
 popd
 
 # Deploy Application Layer - Healthcare Information Protection
+echo "Deploy Application Layer - Healthcare Information Protection"
 pushd application_layer/healthcare_infoProtection
 ./deploy_application.sh
 popd
 
 # Deploy Application Layer - Temperature Events - TODO 
+echo "Deploy Application Layer - Temperature Events"
 pushd application_layer/temperature_events
 #./deploy_application.sh
 popd

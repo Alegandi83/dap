@@ -30,13 +30,13 @@ set -o pipefail
 set -o nounset
 # set -o xtrace # For debugging
 
-###################
-# REQUIRED ENV VARIABLES:
-#
-# AZURE_SUBSCRIPTION_ID
-# RESOURCE_GROUP_NAME
-# DATAFACTORY_NAME
-# ADF_DIR
+
+# Retrieve info from KeyVault
+echo "Retrieve info from KeyVault"
+ADF_DIR=.tmp/adf
+RESOURCE_GROUP_NAME=$resource_group_name
+DATAFACTORY_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "adfName" --query value -o tsv)
+
 
 
 # Consts

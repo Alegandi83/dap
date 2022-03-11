@@ -11,13 +11,13 @@ export ENV_NAME=dev
 export SYNAPSE_SQL_PASSWORD=Sql_Adminpswag83!
 export DB_SQL_PASSWORD=Sqladminpswag83!
 export kv_owner_object_id=20b8fb52-db34-40c0-858a-3024a4dc8bd5
-export DEPLOYMENT_ID=00006
+export DEPLOYMENT_ID=00008
 export PROJECT=ag83
 export resource_group_name="$PROJECT-$DEPLOYMENT_ID-$ENV_NAME-rg"
 export PBI_TENANT_ID=0856a07c-daf4-44cf-acd9-12b9ba5ad6f0
 export PBI_DAP_USR_MAIL=agandini_microsoft.com#EXT#@agandini.onmicrosoft.com
 
-export kv_name="ag83-kv-dev-00006"
+export kv_name="ag83-kv-dev-00008"
 export kv_dns_name=https://${kv_name}.vault.azure.net/
 
 

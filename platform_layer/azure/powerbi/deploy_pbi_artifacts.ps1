@@ -25,15 +25,15 @@ else {
   Write-Host "Creating new workspace named $workspaceName"
   $workspace = New-PowerBIGroup -Name $workspaceName
 
-  # Store workspace id on key vault
-  Write-Host "Store workspace name, id on key-vault"
-  az keyvault secret set --vault-name $kvName --name "pbiwsname" --value $workspaceName
-  az keyvault secret set --vault-name $kvName --name "pbiwsid" --value $workspace.id
-
   # add user as workspace member
   Write-Host "Add user as workspace member: $userEmail" 
   Add-PowerBIWorkspaceUser -Id $workspace.Id -UserEmailAddress $userEmail -AccessRight Member
 
 }
+
+# Store workspace id on key vault
+Write-Host "Store workspace name, id on key-vault"
+az keyvault secret set --vault-name $kvName --name "pbiwsname" --value $workspaceName
+az keyvault secret set --vault-name $kvName --name "pbiwsid" --value $workspace.id
 
 Write-Host "End PowerBI Workspace Setup"
