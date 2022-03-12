@@ -1,0 +1,17 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RoleNew]
+(
+	[RoleID] [nvarchar](4000) NULL,
+	[Name] [nvarchar](4000) NULL,
+	[Email] [nvarchar](4000) NULL,
+	[Roles] [nvarchar](4000) NULL
+)
+WITH
+(
+	DISTRIBUTION = ROUND_ROBIN,
+	CLUSTERED COLUMNSTORE INDEX
+)
+GO

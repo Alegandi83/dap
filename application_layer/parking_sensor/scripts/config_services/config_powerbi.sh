@@ -8,4 +8,4 @@ syn_db_name=$(az keyvault secret show --vault-name "$kv_name" --name "synapseDed
 syn_endpoint=$(az keyvault secret show --vault-name "$kv_name" --name "synapseSqlEndpoint" --query value -o tsv)
 
 # Import PowerBI Reports and Update related Datasets
-pwsh ./powerbi/scripts/deploy_pbi_app.ps1 -workspaceName ${pbi_ws_name} -synEndpoint ${syn_db_name} -synDbName ${syn_endpoint}
+pwsh ./powerbi/scripts/deploy_pbi_app.ps1 -workspaceName ${pbi_ws_name} -synEndpoint ${syn_endpoint} -synDbName ${syn_db_name}

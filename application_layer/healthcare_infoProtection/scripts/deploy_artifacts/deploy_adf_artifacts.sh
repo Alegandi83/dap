@@ -38,7 +38,6 @@ RESOURCE_GROUP_NAME=$resource_group_name
 DATAFACTORY_NAME=$(az keyvault secret show --vault-name "$kv_name" --name "adfName" --query value -o tsv)
 
 
-
 # Consts
 apiVersion="2018-06-01"
 baseUrl="https://management.azure.com/subscriptions/${AZURE_SUBSCRIPTION_ID}"
@@ -94,6 +93,7 @@ echo "Start deploying Data Factory artifacts - Healthcare information Protection
 
 
 echo "Create temp dir"               
+adfTempDir=${ADF_DIR}
 mkdir -p $adfTempDir && cp -a adf/ .tmp/
 
 # Deploy all Pipelines

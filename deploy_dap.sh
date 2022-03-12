@@ -39,7 +39,7 @@ pushd platform_layer/onprem
 popd
 
 
-# APPLICATION LAYER ------------------------------------------------------------
+# APPLICATION LAYER ------------------------------------------------------------ 
 
 # Deploy Application Layer - Parking Sensor
 echo "Deploy Application Layer - Parking Sensor"

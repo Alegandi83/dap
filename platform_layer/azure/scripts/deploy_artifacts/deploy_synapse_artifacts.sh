@@ -161,12 +161,12 @@ listAuthKeys () {
 createLinkedService () {
     declare name=$1
     echo "Creating Synapse LinkedService: $name"
-    az synapse linked-service create --file @./.tmp/synapse/workspace/linkedService/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse linked-service create --file @./.tmp/synapse/linkedService/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 createDataset () {
     declare name=$1
     echo "Creating Synapse Dataset: $name"
-    az synapse dataset create --file @./.tmp/synapse/workspace/dataset/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse dataset create --file @./.tmp/synapse/dataset/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 createNotebook() {
     declare name=$1
@@ -174,7 +174,7 @@ createNotebook() {
     # Thus, we are resorting to deploying notebooks in .ipynb format.
     # See here: https://github.com/Azure/azure-cli/issues/20037
     echo "Creating Synapse Notebook: $name"
-    az synapse notebook create --file @./.tmp/synapse/workspace/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
+    az synapse notebook create --file @./.tmp/synapse/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
 }
 createPipeline () {
     declare name=$1
@@ -182,14 +182,14 @@ createPipeline () {
 
     # Replace dedicated sql pool name
     tmp=$(mktemp)
-    jq --arg a "${SQL_POOL_NAME}" '.properties.activities[5].sqlPool.referenceName = $a' ./synapse/workspace/pipeline/"${name}".json > "$tmp" && mv "$tmp" ./synapse/workspace/pipeline/"${name}".json
+    jq --arg a "${SQL_POOL_NAME}" '.properties.activities[5].sqlPool.referenceName = $a' ./synapse/pipeline/"${name}".json > "$tmp" && mv "$tmp" ./synapse/pipeline/"${name}".json
     # Deploy the pipeline
-    az synapse pipeline create --file @./.tmp/synapse/workspace/pipeline/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse pipeline create --file @./.tmp/synapse/pipeline/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 createTrigger () {
     declare name=$1
     echo "Creating Synapse Trigger: $name"
-    az synapse trigger create --file @./.tmp/synapse/workspace/trigger/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
+    az synapse trigger create --file @./.tmp/synapse/trigger/"${name}".json --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}"
 }
 
 
@@ -206,8 +206,8 @@ getProvisioningState(){
 UpdateExternalTableScript () {
     echo "Replace SQL script with: $AZURE_STORAGE_ACCOUNT"
     sed "s/<data storage account>/$AZURE_STORAGE_ACCOUNT/" \
-    ./synapse/workspace/scripts/create_external_table_template.sql \
-    > ./synapse/workspace/scripts/create_external_table.sql
+    ./synapse/scripts/create_external_table_template.sql \
+    > ./synapse/scripts/create_external_table.sql
 }
 
 UploadSql () {
@@ -221,7 +221,7 @@ UploadSql () {
     # Step 2: create workspace package placeholder
     synapseSqlBaseUri=${SYNAPSE_DEV_ENDPOINT}/sqlScripts
     synapseSqlApiUri="${synapseSqlBaseUri}/$name?api-version=${apiVersion}"
-    body_content="$(sed 'N;s/\n/\\n/' ./synapse/workspace/scripts/$name.sql)"
+    body_content="$(sed 'N;s/\n/\\n/' ./synapse/scripts/$name.sql)"
     json_body="{
     \"name\": \"$name\",
     \"properties\": {
