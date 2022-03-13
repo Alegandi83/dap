@@ -44,6 +44,7 @@ AZURE_STORAGE_ACCOUNT=$(az keyvault secret show --vault-name "$kv_name" --name "
 
 # Consts
 echo "Set Variables"
+application_name="platform"
 apiVersion="2020-12-01&force=true"
 dataPlaneApiVersion="2019-06-01-preview"
 synapseResource="https://dev.azuresynapse.net"
@@ -213,7 +214,8 @@ UpdateExternalTableScript () {
 UploadSql () {
     echo "Try to upload sql script"
     declare name=$1
-    echo "Uploading sql script to Workspace: $name"
+    declare folder=$2
+    echo "Uploading sql script to Workspace. Folder: ${folder} , File: ${name}"
 
     #az synapse workspace wait --resource-group "${RESOURCE_GROUP_NAME}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --created
     # Step 1: Get bearer token for the Data plane    
@@ -221,11 +223,14 @@ UploadSql () {
     # Step 2: create workspace package placeholder
     synapseSqlBaseUri=${SYNAPSE_DEV_ENDPOINT}/sqlScripts
     synapseSqlApiUri="${synapseSqlBaseUri}/$name?api-version=${apiVersion}"
-    body_content="$(sed 'N;s/\n/\\n/' ./synapse/scripts/$name.sql)"
+    body_content="$(sed 'N;s/\n/\\n/' ./synapse/sqlscript/${folder}/${name}.sql)"
     json_body="{
     \"name\": \"$name\",
     \"properties\": {
-        \"description\": \"$name\",        
+        \"description\": \"$name\",    
+		\"folder\": {
+			\"name\": \"${application_name}/${folder}\"
+		},            
         \"content\":{ 
             \"query\": \"$body_content\",
             \"currentConnection\": { 
@@ -294,6 +299,6 @@ createPipeline "BulkCopyfrom_AzureSQLdb_to_SynapseDedicatedPool"
 
 # Deploy SQL Scripts
 echo "Deploy SQL Scripts"
-UploadSql "create_purview_user"
+UploadSql "create_purview_user" "setup"
 
 echo "Completed deploying Synapse artifacts - Platform Layer"

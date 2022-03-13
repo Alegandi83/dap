@@ -44,6 +44,7 @@ AZURE_STORAGE_ACCOUNT=$(az keyvault secret show --vault-name "$kv_name" --name "
 
 # Consts
 echo "Set Variables"
+application_name="healthcare_infoProtection"
 apiVersion="2020-12-01&force=true"
 dataPlaneApiVersion="2019-06-01-preview"
 synapseResource="https://dev.azuresynapse.net"
@@ -174,7 +175,7 @@ createNotebook() {
     # Thus, we are resorting to deploying notebooks in .ipynb format.
     # See here: https://github.com/Azure/azure-cli/issues/20037
     echo "Creating Synapse Notebook: $name"
-    az synapse notebook create --file @./.tmp/synapse/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
+    az synapse notebook create --file @./.tmp/synapse/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}" --folder-path "${application_name}"
 }
 createPipeline () {
     declare name=$1
@@ -209,11 +210,12 @@ UpdateExternalTableScript () {
     ./synapse/scripts/create_external_table_template.sql \
     > ./synapse/scripts/create_external_table.sql
 }
-
+ 
 UploadSql () {
     echo "Try to upload sql script"
     declare name=$1
-    echo "Uploading sql script to Workspace: $name"
+    declare folder=$2
+    echo "Uploading sql script to Workspace. Folder: ${folder} , File: ${name}"
 
     #az synapse workspace wait --resource-group "${RESOURCE_GROUP_NAME}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --created
     # Step 1: Get bearer token for the Data plane    
@@ -221,11 +223,14 @@ UploadSql () {
     # Step 2: create workspace package placeholder
     synapseSqlBaseUri=${SYNAPSE_DEV_ENDPOINT}/sqlScripts
     synapseSqlApiUri="${synapseSqlBaseUri}/$name?api-version=${apiVersion}"
-    body_content="$(sed 'N;s/\n/\\n/' ./synapse/sqlscript_orig/${name}.sql)"
+    body_content="$(sed 'N;s/\n/\\n/' ./synapse/sqlscript/${folder}/${name}.sql)"
     json_body="{
     \"name\": \"$name\",
     \"properties\": {
-        \"description\": \"$name\",        
+        \"description\": \"$name\",    
+		\"folder\": {
+			\"name\": \"${application_name}/${folder}\"
+		},            
         \"content\":{ 
             \"query\": \"$body_content\",
             \"currentConnection\": { 
@@ -276,36 +281,33 @@ echo "Deploy Pipelines"
 
 # Deploy SQL Scripts
 echo "Deploy SQL Scripts"
-#UploadSql "0 Set up Script RLS DDM"
-UploadSql "1_SQL_Pool_Security_DDM"
-#UploadSql "2 HealthCare SQL Pool Security RLS"
-#UploadSql "3 HealthCare SQL Pool Security CLS"
-#UploadSql "CLS_ChiefOperatingManager"
-#UploadSql "CLS_DAM_AC_New"
-#UploadSql "CLS_DAM_F_New"
-#UploadSql "Confirm_DDM"
-#UploadSql "create_purview_user"
-#UploadSql "createExternalTable_PatientInformation"
-#UploadSql "createSchema_hpi"
-#UploadSql "createTable_Campaign_Analytics_New"
-#UploadSql "createTable_Campaign_Analytics"
-#UploadSql "createTable_HealthCare-FactSales"
-#UploadSql "createTable_HospitalEmpPIIData"
-#UploadSql "createTable_Mkt_CampaignAnalyticLatest"
-#UploadSql "createTable_PatientInformation"
-#UploadSql "createTable_RoleNew"
-#UploadSql "createUsers"
-#UploadSql "loadTable_Campaign_Analytics_New"
-#UploadSql "loadTable_Campaign_Analytics"
-#UploadSql "loadTable_Healthcare-FactSales"
-#UploadSql "loadTable_HospitalEmpPIIData"
-#UploadSql "loadTable_Mkt_CampaignAnalyticLatest"
-#UploadSql "loadTable_PatientInformation"
-#UploadSql "loadTable_RoleNew"
-#UploadSql "Sp_HealthCareRLS"
-#UploadSql "SP_RLS_CareManagerLosAngeles"
-#UploadSql "SP_RLS_CareManagerMiami"
-#UploadSql "SP_RLS_ChiefOperatingManager"
+UploadSql "0_createUsers" "setup"
+UploadSql "1_Setup_RLS_DDM" "setup"
+
+UploadSql "1_SQL_Pool_Security_DDM" "analysis"
+UploadSql "2_SQL_Pool_Security_RLS" "analysis"
+UploadSql "3_SQL_Pool_Security_CLS" "analysis"
+
+UploadSql "Confirm_DDM" "storeProcedures"
+UploadSql "CLS_ChiefOperatingManager" "storeProcedures"
+UploadSql "CLS_DAM_AC_New" "storeProcedures"
+UploadSql "CLS_DAM_F_New" "storeProcedures"
+UploadSql "Sp_HealthCareRLS" "storeProcedures"
+UploadSql "SP_RLS_CareManagerLosAngeles" "storeProcedures"
+UploadSql "SP_RLS_CareManagerMiami" "storeProcedures"
+UploadSql "SP_RLS_ChiefOperatingManager" "storeProcedures"
+
+UploadSql "createSchema_hpi" "createTables"
+UploadSql "createTable_PatientInformation" "createTables"
+UploadSql "createTable_Campaign_Analytics_New" "createTables"
+UploadSql "createTable_Campaign_Analytics" "createTables"
+UploadSql "createTable_HealthCare-FactSales" "createTables"
+UploadSql "createTable_HospitalEmpPIIData" "createTables"
+UploadSql "createTable_Mkt_CampaignAnalyticLatest" "createTables"
+UploadSql "createTable_PatientInformation" "createTables"
+UploadSql "createTable_RoleNew" "createTables"
+
+
 
 echo "Completed deploying Synapse artifacts - Healthcare information Protection"
 # End Deploy Use Case - Healthcare information Protection ------------------------------------------

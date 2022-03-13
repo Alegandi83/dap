@@ -50,6 +50,7 @@ ADLSLocation="abfss://datalake@${AZURE_STORAGE_ACCOUNT}.dfs.core.windows.net"
 
 # Consts
 echo "Set Variables"
+application_name="parking_sensor"
 apiVersion="2020-12-01&force=true"
 dataPlaneApiVersion="2019-06-01-preview"
 synapseResource="https://dev.azuresynapse.net"
@@ -180,7 +181,7 @@ createNotebook() {
     # Thus, we are resorting to deploying notebooks in .ipynb format.
     # See here: https://github.com/Azure/azure-cli/issues/20037
     echo "Creating Synapse Notebook: $name"
-    az synapse notebook create --file @./.tmp/synapse/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}"
+    az synapse notebook create --file @./.tmp/synapse/notebook/"${name}".ipynb --name="${name}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --spark-pool-name "${BIG_DATAPOOL_NAME}" --folder-path "${application_name}"
 }
 createPipeline () {
     declare name=$1
@@ -212,14 +213,15 @@ getProvisioningState(){
 UpdateExternalTableScript () {
     echo "Replace SQL script with: $AZURE_STORAGE_ACCOUNT"
     sed "s/<data storage account>/$AZURE_STORAGE_ACCOUNT/" \
-    ./synapse/scripts/create_external_table_template.sql \
-    > ./synapse/scripts/create_external_table.sql
+    ./synapse/sqlscript/setup/create_external_table_template.sql \
+    > ./synapse/sqlscript/setup/create_external_table.sql
 }
-
+ 
 UploadSql () {
     echo "Try to upload sql script"
     declare name=$1
-    echo "Uploading sql script to Workspace: $name"
+    declare folder=$2
+    echo "Uploading sql script to Workspace. Folder: ${folder} , File: ${name}"
 
     #az synapse workspace wait --resource-group "${RESOURCE_GROUP_NAME}" --workspace-name "${SYNAPSE_WORKSPACE_NAME}" --created
     # Step 1: Get bearer token for the Data plane    
@@ -227,11 +229,14 @@ UploadSql () {
     # Step 2: create workspace package placeholder
     synapseSqlBaseUri=${SYNAPSE_DEV_ENDPOINT}/sqlScripts
     synapseSqlApiUri="${synapseSqlBaseUri}/$name?api-version=${apiVersion}"
-    body_content="$(sed 'N;s/\n/\\n/' ./synapse/scripts/$name.sql)"
+    body_content="$(sed 'N;s/\n/\\n/' ./synapse/sqlscript/${folder}/${name}.sql)"
     json_body="{
     \"name\": \"$name\",
     \"properties\": {
-        \"description\": \"$name\",        
+        \"description\": \"$name\",    
+		\"folder\": {
+			\"name\": \"${application_name}/${folder}\"
+		},            
         \"content\":{ 
             \"query\": \"$body_content\",
             \"currentConnection\": { 
@@ -252,12 +257,12 @@ UploadSql () {
 getProvisioningState
 echo "$provision_state"
 
-while [ "$provision_state" != "Succeeded" ]
-do
-    if [ "$provision_state" == "Failed" ]; then break ; else sleep 10; fi
-    getProvisioningState
-    echo "$provision_state: checking again in 10 seconds..."
-done
+#while [ "$provision_state" != "Succeeded" ]
+#do
+#    if [ "$provision_state" == "Failed" ]; then break ; else sleep 10; fi
+#    getProvisioningState
+#    echo "$provision_state: checking again in 10 seconds..."
+#done
 
 
  
@@ -332,8 +337,8 @@ UpdateExternalTableScript
 # Upload create_db_user_template for now. 
 # TODO: will replace and run this sql in deploying
 # TODO: will replace and run this sql in deploying
-UploadSql "create_db_user_template"
-UploadSql "create_external_table"
+UploadSql "create_db_user_template" "setup"
+UploadSql "create_external_table" "setup"
 
 echo "Completed deploying Synapse artifacts - Parking Sensor"
 # End Deploy Use Case - Parking Sensor ------------------------------------------

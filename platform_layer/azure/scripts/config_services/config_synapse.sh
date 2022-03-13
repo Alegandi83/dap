@@ -93,7 +93,7 @@ jq --arg databricks_workspace_resource_id "$databricks_workspace_resource_id" '.
 jq --arg pbitenantid "${PBI_TENANT_ID}" '.properties.typeProperties.tenantID = $pbitenantid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
 jq --arg pbiworkspaceid "${pbi_ws_id}" '.properties.typeProperties.workspaceID = $pbiworkspaceid' $synLsDir/Ls_PowerBI_01.json > "$tmpfile" && mv "$tmpfile" $synLsDir/Ls_PowerBI_01.json
 
-synScriptsDir=$synTempDir/scripts
+synScriptsDir=$synTempDir/sqlscript
 sed "s/<purview_name>/$purview_name/" \
-$synScriptsDir/create_purview_user.sql \
+$synScriptsDir/setup/create_purview_user.sql \
 > "$tmpfile" && mv "$tmpfile" $synScriptsDir/create_purview_user.json

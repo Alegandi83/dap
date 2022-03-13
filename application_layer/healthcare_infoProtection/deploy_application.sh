@@ -11,6 +11,7 @@ export kv_dns_name=$(az keyvault secret show --vault-name "$kv_name" --name "kvU
 
 
 # Deploy Artifacts
+#./scripts/deploy_artifacts/deploy_hostDataSources.sh
 ./scripts/deploy_artifacts/deploy_dockDataSources.sh
 ./scripts/deploy_artifacts/deploy_adf_artifacts.sh
 ./scripts/deploy_artifacts/deploy_synapse_artifacts.sh
