@@ -4,8 +4,6 @@ export kv_owner_object_id=20b8fb52-db34-40c0-858a-3024a4dc8bd5
 export DEPLOYMENT_ID=00008
 export kv_name="ag83-kv-dev-00008"
 
-
-
 #--------------------------------------------------------------------------------
 # Purview Setup script
 
