@@ -7,6 +7,7 @@ set -o nounset
 # Connect to Azure 
 echo "Connect to Azure"
 az login
+az account list -o table
 
 # Set Resource Group name 
 export ENV_NAME=dev

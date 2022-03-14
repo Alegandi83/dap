@@ -1,7 +1,7 @@
 USE hpi
 GO
 
-INSERT INTO [hpi].[ControlTableForTemplate]
+INSERT INTO [dbo].[ControlTableForTemplate]
 SELECT		ROW_NUMBER() OVER(order by name) as PartitionID,
 			SCHEMA_NAME(schema_id) as SourceTableSchema,
 			name as SourceTableName,

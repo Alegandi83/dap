@@ -4,6 +4,7 @@ from        hpi.PatientInformation
 
 -- Step:2 Let's confirm that there are no Dynamic Data Masking (DDM) applied on columns
 Exec hpi.[Confirm_DDM]
+GO
 -- No results returned verify that no data masking has been done yet.
 
 -- Step:3 Now lets mask 'Medical Insurance Card' and 'Email' Column of 'PatientInformation' table.
@@ -17,6 +18,7 @@ GO
 
 -- Step:4 Let's see Dynamic Data Masking (DDM) applied on the two columns.
 Exec hpi.[Confirm_DDM]
+GO
 
 -- Step:5 Now, let us grant SELECT permission to 'CareManager'sysusers on the 'PatientInformation' table.
 SELECT      Name as [User] 
@@ -37,6 +39,7 @@ SELECT      top 10 *
 FROM        hpi.PatientInformation; 
 revert; 
 REVOKE UNMASK TO CareManager;  
+
 
 ----step:8 Reverting all the changes back to as it was.
 ALTER TABLE hpi.PatientInformation
